@@ -1,61 +1,78 @@
-import mongoose from 'mongoose';
+import mongoose, { Schema, Document } from 'mongoose';
 import bcrypt from 'bcryptjs';
 
-export interface IUser extends mongoose.Document {
+export interface IUser extends Document {
     name: string;
     email: string;
-    password?: string;
-    role: 'student' | 'admin';
-    matchPassword(enteredPassword: string): Promise<boolean>;
+    password: string;
+    role: 'student' | 'teacher' | 'admin';
+    isActive: boolean;
+    comparePassword(candidatePassword: string): Promise<boolean>;
 }
 
-const userSchema = new mongoose.Schema<IUser>(
-    {
-        name: {
-            type: String,
-            required: [true, 'Please add a name'],
-        },
-        email: {
-            type: String,
-            required: [true, 'Please add an email'],
-            unique: true,
-            match: [/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/, 'Please add a valid email'],
-        },
-        password: {
-            type: String,
-            required: [true, 'Please add a password'],
-            minlength: 6,
-            select: false,
-        },
-        role: {
-            type: String,
-            enum: ['student', 'admin'],
-            default: 'student',
-        },
+const UserSchema: Schema = new Schema({
+    name: {
+        type: String,
+        required: [true, 'Name is required'],
+        trim: true,
+        minlength: [2, 'Name must be at least 2 characters'],
+        maxlength: [50, 'Name cannot exceed 50 characters']
     },
-    {
-        timestamps: true,
+    email: {
+        type: String,
+        required: [true, 'Email is required'],
+        unique: true,
+        lowercase: true,
+        trim: true,
+        match: [/^\S+@\S+\.\S+$/, 'Please enter a valid email']
+    },
+    password: {
+        type: String,
+        required: [true, 'Password is required'],
+        minlength: [6, 'Password must be at least 6 characters'],
+        select: false
+    },
+    role: {
+        type: String,
+        enum: ['student', 'teacher', 'admin'],
+        default: 'student'
+    },
+    isActive: {
+        type: Boolean,
+        default: true
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now
+    },
+    updatedAt: {
+        type: Date,
+        default: Date.now
     }
-);
+});
 
-// Encrypt password using bcrypt
-userSchema.pre('save', async function (next) {
-    if (!this.isModified('password')) {
-        return next();
-    }
+// Hash password before saving
+UserSchema.pre('save', async function (next) {
+    if (!this.isModified('password')) return next();
 
-    if (this.password) {
+    try {
         const salt = await bcrypt.genSalt(10);
-        this.password = await bcrypt.hash(this.password, salt);
+        this.password = await bcrypt.hash(this.password as string, salt);
+        next();
+    } catch (error: any) {
+        next(error);
     }
+});
+
+// Update updatedAt timestamp
+UserSchema.pre('save', function (next) {
+    this.updatedAt = new Date();
     next();
 });
 
-// Match user entered password to hashed password in database
-userSchema.methods.matchPassword = async function (enteredPassword: string) {
-    return await bcrypt.compare(enteredPassword, this.password);
+// Method to compare password
+UserSchema.methods.comparePassword = async function (candidatePassword: string): Promise<boolean> {
+    return await bcrypt.compare(candidatePassword, this.password);
 };
 
-const User = mongoose.model<IUser>('User', userSchema);
-
-export default User;
+export default mongoose.model<IUser>('User', UserSchema);
