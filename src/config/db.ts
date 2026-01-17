@@ -9,11 +9,11 @@ const connectDB = async () => {
         console.log(`MongoDB Connected: ${conn.connection.host}`);
     } catch (error) {
         if (error instanceof Error) {
-            console.error(`Error: ${error.message}`);
+            console.error(`❌ MongoDB Connection Error: ${error.message}`);
         } else {
-            console.error('An unknown error occurred during database connection');
+            console.error('❌ An unknown error occurred during database connection');
         }
-        process.exit(1);
+        // process.exit(1); // Don't kill the app, let it stay alive for logs
     }
 };
 
