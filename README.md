@@ -40,6 +40,10 @@ A complete backend API for an educational platform built with Node.js, Express, 
    npm start
    ```
 
+## API Documentation
+- **Swagger UI:** [https://educational-platform-api2-production.up.railway.app/api-docs](https://educational-platform-api2-production.up.railway.app/api-docs)
+- **Postman Collection:** A file named `educational-platform.postman_collection.json` is provided in the root directory for easy testing.
+
 ## API Endpoints
 
 ### Auth

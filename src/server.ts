@@ -4,6 +4,8 @@ import cors from 'cors';
 import connectDB from './config/db';
 import authRoutes from './routes/auth.routes';
 import courseRoutes from './routes/course.routes';
+import swaggerUi from 'swagger-ui-express';
+import swaggerSpec from './config/swagger';
 
 // Load env vars
 dotenv.config();
@@ -22,6 +24,9 @@ app.use(cors());
 // Mount routers
 app.use('/api/auth', authRoutes);
 app.use('/api/courses', courseRoutes);
+
+// Swagger documentation
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Welcome route
 app.get('/', (req, res) => {
