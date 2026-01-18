@@ -11,13 +11,23 @@ import swaggerJsdoc from 'swagger-jsdoc';
 import authRoutes from './routes/auth.routes';
 import courseRoutes from './routes/course.routes';
 
-// Load env
+// Load env first
 dotenv.config();
 
 // Create app
 const app: Application = express();
 
-// Middleware
+// 1. Healthcheck (RESPOND ASAP to Railway)
+app.get('/health', (_req, res) => {
+    res.status(200).json({
+        status: 'healthy',
+        database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
+        uptime: process.uptime(),
+        timestamp: new Date().toISOString()
+    });
+});
+
+// 2. Middlewares
 app.use(helmet());
 app.use(cors({ origin: '*', credentials: true }));
 app.use(express.json());
@@ -27,103 +37,93 @@ if (process.env.NODE_ENV !== 'production') {
     app.use(morgan('dev'));
 }
 
-// MongoDB connection
-const connectDB = async (): Promise<void> => {
-    const mongoUri = process.env.MONGO_URI;
-    if (!mongoUri) {
-        console.error('❌ MONGO_URI not defined in environment');
-        return;
-    }
-
-    try {
-        await mongoose.connect(mongoUri);
-        console.log('✅ MongoDB Connected');
-    } catch (err) {
-        console.error('❌ MongoDB Connection Failed:', err);
-    }
-
-    mongoose.connection.on('disconnected', () =>
-        console.warn('⚠️ MongoDB Disconnected')
-    );
-    mongoose.connection.on('error', (err) =>
-        console.error('❌ MongoDB Error:', err)
-    );
-};
-
-// Swagger Configuration
-const swaggerOptions = {
-    definition: {
-        openapi: '3.0.0',
-        info: {
-            title: 'Educational Platform API',
-            version: '1.0.0',
-            description: 'API documentation for the Educational Platform',
-        },
-        servers: [
-            {
-                url: process.env.NODE_ENV === 'production'
-                    ? 'https://educational-platform-api2-production.up.railway.app'
-                    : `http://localhost:${process.env.PORT || 8080}`,
+// 3. Swagger Configuration (Wrap in try-catch to avoid crash)
+try {
+    const swaggerOptions = {
+        definition: {
+            openapi: '3.0.0',
+            info: {
+                title: 'Educational Platform API',
+                version: '1.0.0',
+                description: 'API documentation for the Educational Platform',
             },
-        ],
-    },
-    apis: ['./src/routes/*.ts'], // Path to the API docs
-};
+            servers: [
+                {
+                    url: process.env.NODE_ENV === 'production'
+                        ? 'https://educational-platform-api2-production.up.railway.app'
+                        : `http://localhost:${process.env.PORT || 8080}`,
+                },
+            ],
+        },
+        apis: ['./src/routes/*.ts', './dist/routes/*.js'],
+    };
 
-const swaggerDocs = swaggerJsdoc(swaggerOptions);
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+    const swaggerDocs = swaggerJsdoc(swaggerOptions);
+    app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+} catch (error) {
+    console.error('⚠️ Swagger failed to load:', error);
+}
 
-// Routes
+// 4. Routes Configuration
 const API_PREFIX = process.env.API_PREFIX || '/api/v1';
 
-// Healthcheck
-app.get('/health', (_req, res) => {
-    res.status(200).json({
-        status: 'healthy',
-        database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
-    });
-});
-
-// Base route
+// Base root info
 app.get('/', (_req, res) => {
     res.json({
         success: true,
         message: '🎓 Edu Platform API is running',
         docs: '/api-docs',
+        test: `${API_PREFIX}/test`,
         version: '1.0.0',
     });
 });
 
-// Test route
 app.get(`${API_PREFIX}/test`, (_req, res) => {
     res.json({ success: true, message: 'API is working 🚀' });
 });
 
-// Mount Routes
+// App Routes
 app.use(`${API_PREFIX}/auth`, authRoutes);
 app.use(`${API_PREFIX}/courses`, courseRoutes);
 
-// 404
+// 404 handler
 app.use('*', (req: Request, res: Response) => {
     res.status(404).json({ success: false, message: 'Route not found', path: req.originalUrl });
 });
 
-// Error handler
-app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
-    console.error(err.stack);
+// 5. Global Error Handler
+app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
+    console.error('❌ Server Error:', err.message || err);
     res.status(500).json({
         success: false,
         message: process.env.NODE_ENV === 'development' ? err.message : 'Internal server error',
     });
 });
 
-// Start server immediately (Crucial for Railway health checks)
+// 6. Server Initialization
 const PORT = Number(process.env.PORT) || 8080;
 
 app.listen(PORT, '0.0.0.0', () => {
-    console.log(`🚀 Server running on port ${PORT}`);
-    // Connect DB in background AFTER server starts
-    connectDB();
+    console.log(`🚀 Server running on port ${PORT} in ${process.env.NODE_ENV || 'development'} mode`);
+
+    // Background DB connection
+    const mongoUri = process.env.MONGO_URI;
+    if (!mongoUri) {
+        console.error('❌ CRITICAL: MONGO_URI is not defined!');
+    } else {
+        mongoose.connect(mongoUri)
+            .then(() => console.log('✅ MongoDB Connected'))
+            .catch(err => console.error('❌ MongoDB Connection Failed:', err));
+    }
+});
+
+// 7. Process error handlers
+process.on('uncaughtException', (err) => {
+    console.error('🔥 CRITICAL: Uncaught Exception:', err);
+});
+
+process.on('unhandledRejection', (reason) => {
+    console.error('🔥 CRITICAL: Unhandled Rejection:', reason);
 });
 
 // Graceful shutdown

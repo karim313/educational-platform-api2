@@ -70,7 +70,7 @@ export const login = async (req: Request, res: Response) => {
 
         const user: any = await User.findOne({ email }).select('+password');
 
-        if (user && (await user.matchPassword(password))) {
+        if (user && (await user.comparePassword(password))) {
             res.json({
                 success: true,
                 _id: user._id,
