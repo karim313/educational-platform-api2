@@ -73,18 +73,30 @@ app.get('/', (_req, res) => {
         success: true,
         message: '🎓 Edu Platform API is running',
         docs: '/api-docs',
-        test: `${API_PREFIX}/test`,
-        version: '1.0.0',
+        endpoints: {
+            auth: ['/api/auth/register', '/api/auth/login'],
+            courses: ['/api/courses'],
+            v1_compatibility: '/api/v1/...'
+        },
+        version: '1.2.0',
     });
 });
 
 app.get(`${API_PREFIX}/test`, (_req, res) => {
-    res.json({ success: true, message: 'API is working 🚀' });
+    res.json({ success: true, message: 'API is working 🚀', prefix: API_PREFIX });
 });
 
-// App Routes
-app.use(`${API_PREFIX}/auth`, authRoutes);
-app.use(`${API_PREFIX}/courses`, courseRoutes);
+// Support both /api and /api/v1 to avoid 404 errors regardless of Railway settings
+app.use('/api/auth', authRoutes);
+app.use('/api/v1/auth', authRoutes);
+app.use('/api/courses', courseRoutes);
+app.use('/api/v1/courses', courseRoutes);
+
+// Custom fallback if a different prefix is set in Railway
+if (API_PREFIX !== '/api' && API_PREFIX !== '/api/v1') {
+    app.use(`${API_PREFIX}/auth`, authRoutes);
+    app.use(`${API_PREFIX}/courses`, courseRoutes);
+}
 
 // 404 handler
 app.use('*', (req: Request, res: Response) => {
