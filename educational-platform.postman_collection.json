@@ -307,7 +307,7 @@
     "variable": [
         {
             "key": "baseUrl",
-            "value": "https://educational-platform-api2-production.up.railway.app",
+            "value": "https://educational-platform-api2-production-75ed.up.railway.app",
             "type": "string"
         },
         {

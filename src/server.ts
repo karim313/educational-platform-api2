@@ -65,7 +65,7 @@ try {
 }
 
 // 4. Routes Configuration
-const API_PREFIX = process.env.API_PREFIX || '/api/v1';
+const API_PREFIX = process.env.API_PREFIX || '/api';
 
 // Base root info
 app.get('/', (_req, res) => {
