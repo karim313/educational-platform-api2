@@ -1,6 +1,6 @@
 # 🎓 Educational Platform API Documentation
 
-Welcome to the official API documentation for the Educational Platform. This document provides all the details needed to integrate the frontend with the backend services.
+Welcome to the official API documentation for the Educational Platform.
 
 ---
 
@@ -11,148 +11,50 @@ Welcome to the official API documentation for the Educational Platform. This doc
 | **Production** | `https://educational-platform-api2-production-75ed.up.railway.app` |
 | **Development** | `http://localhost:8080` |
 
-> [!IMPORTANT]
-> All API endpoints are prefixed with `/api`. For compatibility, `/api/v1` is also supported.
+---
+
+## 🔐 Authentication
+Protected routes require a **JWT Bearer Token**: `Authorization: Bearer <token>`
 
 ---
 
-## 🔐 Global Configuration
+## 🛒 Enrollment & Payment System
 
-### Headers
-All requests must include the following headers for proper communication:
-
-```http
-Content-Type: application/json
-Accept: application/json
-```
-
-### Authentication
-Protected routes require a **JWT Bearer Token** in the authorization header:
-
-```http
-Authorization: Bearer <your_jwt_token>
-```
-
----
-
-## 🔑 Authentication Endpoints
-
-### 1. User Registration
-`POST /api/auth/register` - Creates a new user account.
+### 1. Purchase/Enroll in Course
+`POST /api/enrollments/purchase/:courseId` - **Protected**
 
 **Request Body:**
 | Field | Type | Required | Description |
 | :--- | :--- | :--- | :--- |
-| `name` | String | Yes | Full name of the user |
-| `email` | String | Yes | Unique email address |
-| `password` | String | Yes | Minimum 6 characters |
-| `role` | String | No | `student` (default) or `admin` |
+| `paymentMethod` | String | Yes | `stripe` or `vodafone_cash` |
+| `transactionId` | String | If VC | Required for Vodafone Cash after transfer |
+
+#### A. Stripe Flow (Visa/Mastercard)
+1. Send `paymentMethod: "stripe"`.
+2. API returns a Stripe `url`.
+3. Redirect user to this `url` for payment.
+4. After success, Stripe handles the webhook (or manual verification) to mark as `completed`.
+
+**Response (200 OK):**
+```json
+{
+  "success": true,
+  "url": "https://checkout.stripe.com/...",
+  "sessionId": "cs_test_..."
+}
+```
+
+#### B. Vodafone Cash Flow
+1. Transfer the course price to our number: `${process.env.VODAFONE_CASH_NUMBER}`.
+2. Send `paymentMethod: "vodafone_cash"` and `transactionId: "..."`.
+3. Enrollment status will be `pending` until admin verifies.
 
 **Response (201 Created):**
 ```json
 {
   "success": true,
-  "token": "eyJhbGciOiJIUzI1NiIsInR..."
-}
-```
-
----
-
-### 2. User Login
-`POST /api/auth/login` - Authenticates user and returns a token.
-
-**Request Body:**
-| Field | Type | Required | Description |
-| :--- | :--- | :--- | :--- |
-| `email` | String | Yes | User's email |
-| `password` | String | Yes | User's password |
-
-**Success Response (200 OK):**
-```json
-{
-  "success": true,
-  "token": "eyJhbGciOiJIUzI1NiIsInR..."
-}
-```
-
----
-
-## 📚 Course Endpoints
-
-### 1. Get All Courses
-`GET /api/courses` - Public access to all available courses.
-
-**Response (200 OK):**
-```json
-{
-  "success": true,
-  "count": 5,
-  "data": [
-    {
-      "_id": "65a...",
-      "title": "Advanced TypeScript",
-      "description": "Master TS...",
-      "price": 99.99,
-      "playlists": []
-    }
-  ]
-}
-```
-
----
-
-### 2. Get Single Course
-`GET /api/courses/:courseId` - Public access to full course details including playlists and videos.
-
-**Response (200 OK):**
-```json
-{
-  "success": true,
-  "data": {
-    "_id": "65a...",
-    "title": "...",
-    "playlists": [
-      {
-        "title": "Introduction",
-        "videos": [
-          { "title": "Welcome", "videoUrl": "...", "duration": 10 }
-        ]
-      }
-    ]
-  }
-}
-```
-
----
-
-### 3. Create Course (Admin Only)
-`POST /api/courses` - Create a new course.
-
-**Request Body:**
-| Field | Type | Required | Description |
-| :--- | :--- | :--- | :--- |
-| `title` | String | Yes | Course title |
-| `description` | String | Yes | Detailed description |
-| `price` | Number | Yes | Price in USD/Default currency |
-
----
-
-## 🛒 Enrollment & Purchase
-
-### 1. Purchase/Enroll in Course
-`POST /api/enrollments/purchase/:courseId` - **Protected**
-Enrolls the logged-in user into a specific course.
-
-**Success Response (201 Created):**
-```json
-{
-  "success": true,
-  "message": "Successfully enrolled in course",
-  "data": {
-    "user": "userid...",
-    "course": "courseid...",
-    "enrolledAt": "2024-01-18..."
-  }
+  "message": "Enrollment request submitted. Pending admin verification.",
+  "data": { ... }
 }
 ```
 
@@ -160,37 +62,24 @@ Enrolls the logged-in user into a specific course.
 
 ### 2. Get My Enrolled Courses
 `GET /api/enrollments/my-courses` - **Protected**
-Returns a list of all courses the current user has purchased.
+Returns only courses where `paymentStatus` is `completed`.
 
-**Response (200 OK):**
+---
+
+### 3. Verify Enrollment (Admin Only)
+`PUT /api/enrollments/verify/:enrollmentId` - **Admin Protected**
+
+**Request Body:**
 ```json
 {
-  "success": true,
-  "count": 2,
-  "data": [
-    { "_id": "...", "title": "TypeScript Masterclass", "price": 99 }
-  ]
+  "status": "completed" 
 }
 ```
 
 ---
 
-## ⚠️ Error Handling
-
-The API uses standard HTTP status codes:
-
-| Code | Meaning | Description |
-| :--- | :--- | :--- |
-| **400** | Bad Request | Invalid input or duplicate enrollment |
-| **401** | Unauthorized | Missing or invalid token |
-| **403** | Forbidden | Admin privileges required |
-| **404** | Not Found | Resource does not exist |
-| **500** | Server Error | Internal server issue |
-
-**Error Response Format:**
-```json
-{
-  "success": false,
-  "message": "Error description here"
-}
-```
+## ⚠️ Standard Error Codes
+- **400**: Missing fields or invalid choice.
+- **401**: Unauthorized (Login required).
+- **403**: Forbidden (Admin required).
+- **404**: Course not found.

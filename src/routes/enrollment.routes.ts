@@ -1,6 +1,7 @@
 import express from 'express';
-import { purchaseCourse, getMyCourses } from '../controllers/enrollment.controller';
+import { purchaseCourse, getMyCourses, verifyEnrollment } from '../controllers/enrollment.controller';
 import { protect } from '../middleware/auth';
+import { isAdmin } from '../middleware/isAdmin';
 
 const router = express.Router();
 
@@ -41,5 +42,23 @@ router.post('/purchase/:courseId', protect, purchaseCourse);
  *         description: List of enrolled courses
  */
 router.get('/my-courses', protect, getMyCourses);
+
+/**
+ * @swagger
+ * /api/enrollments/verify/{enrollmentId}:
+ *   put:
+ *     summary: Admin verify enrollment
+ *     tags: [Enrollments]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: enrollmentId
+ *         required: true
+ *     responses:
+ *       200:
+ *         description: Verified
+ */
+router.put('/verify/:enrollmentId', protect, isAdmin, verifyEnrollment);
 
 export default router;
