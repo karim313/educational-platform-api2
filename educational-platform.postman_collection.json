@@ -307,7 +307,7 @@
             "name": "Enrollments",
             "item": [
                 {
-                    "name": "Purchase Course",
+                    "name": "Purchase Course (Stripe)",
                     "request": {
                         "auth": {
                             "type": "bearer",
@@ -321,6 +321,15 @@
                         },
                         "method": "POST",
                         "header": [],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"paymentMethod\": \"stripe\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
                         "url": {
                             "raw": "https://educational-platform-api2-production-75ed.up.railway.app/api/enrollments/purchase/:courseId",
                             "host": [
@@ -335,6 +344,96 @@
                             "variable": [
                                 {
                                     "key": "courseId",
+                                    "value": ""
+                                }
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Purchase Course (Vodafone Cash)",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"paymentMethod\": \"vodafone_cash\",\n    \"transactionId\": \"TXN123456789\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "https://educational-platform-api2-production-75ed.up.railway.app/api/enrollments/purchase/:courseId",
+                            "host": [
+                                "https://educational-platform-api2-production-75ed.up.railway.app"
+                            ],
+                            "path": [
+                                "api",
+                                "enrollments",
+                                "purchase",
+                                ":courseId"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "courseId",
+                                    "value": ""
+                                }
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Verify Enrollment (Admin)",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "PUT",
+                        "header": [],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"status\": \"completed\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "https://educational-platform-api2-production-75ed.up.railway.app/api/enrollments/verify/:enrollmentId",
+                            "host": [
+                                "https://educational-platform-api2-production-75ed.up.railway.app"
+                            ],
+                            "path": [
+                                "api",
+                                "enrollments",
+                                "verify",
+                                ":enrollmentId"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "enrollmentId",
                                     "value": ""
                                 }
                             ]
