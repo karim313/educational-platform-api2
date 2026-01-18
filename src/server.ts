@@ -10,6 +10,7 @@ import swaggerJsdoc from 'swagger-jsdoc';
 // Route imports
 import authRoutes from './routes/auth.routes';
 import courseRoutes from './routes/course.routes';
+import enrollmentRoutes from './routes/enrollment.routes';
 
 // Load env first
 dotenv.config();
@@ -91,11 +92,14 @@ app.use('/api/auth', authRoutes);
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/courses', courseRoutes);
 app.use('/api/v1/courses', courseRoutes);
+app.use('/api/enrollments', enrollmentRoutes);
+app.use('/api/v1/enrollments', enrollmentRoutes);
 
 // Custom fallback if a different prefix is set in Railway
 if (API_PREFIX !== '/api' && API_PREFIX !== '/api/v1') {
     app.use(`${API_PREFIX}/auth`, authRoutes);
     app.use(`${API_PREFIX}/courses`, courseRoutes);
+    app.use(`${API_PREFIX}/enrollments`, enrollmentRoutes);
 }
 
 // 404 handler
