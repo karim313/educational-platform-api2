@@ -22,18 +22,21 @@ export const register = async (req: Request, res: Response) => {
             return res.status(400).json({ success: false, message: 'User already exists' });
         }
 
-        // Check if an admin already exists
-        const adminExists = await User.findOne({ role: 'admin' });
+        // Admin creation logic
+        let finalRole = role || 'student';
 
-        let finalRole = 'student';
+        if (finalRole === 'admin') {
+            const adminExists = await User.findOne({ role: 'admin' });
 
-        // If no admin exists, we can allow the first registration to be an admin if they requested it
-        // Or if the prompt means "only one admin is allowed", we ensure we don't create a second one.
-        if (role === 'admin') {
+            // If an admin already exists, require a secret key to create another one
             if (adminExists) {
-                return res.status(400).json({ success: false, message: 'An admin already exists. Only one admin is allowed.' });
-            } else {
-                finalRole = 'admin';
+                const secret = req.body.adminSecret;
+                if (secret !== process.env.ADMIN_SECRET) {
+                    return res.status(403).json({
+                        success: false,
+                        message: 'Admin already exists. To create another admin, provide a valid adminSecret.'
+                    });
+                }
             }
         }
 
