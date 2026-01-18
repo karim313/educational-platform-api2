@@ -50,7 +50,7 @@ try {
             servers: [
                 {
                     url: process.env.NODE_ENV === 'production'
-                        ? 'https://educational-platform-api2-production.up.railway.app'
+                        ? 'https://educational-platform-api2-production-75ed.up.railway.app'
                         : `http://localhost:${process.env.PORT || 8080}`,
                 },
             ],
