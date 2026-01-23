@@ -4,7 +4,6 @@ import {
     getCourseById,
     createCourse,
     deleteCourse,
-    addPlaylist,
     addVideo,
 } from '../controllers/course.controller';
 import { protect } from '../middleware/auth';
@@ -108,53 +107,15 @@ router.delete('/:courseId', protect, isAdmin, deleteCourse);
 
 /**
  * @swagger
- * /api/courses/{courseId}/playlists:
+ * /api/courses/{courseId}/videos:
  *   post:
- *     summary: Add playlist to course
+ *     summary: Add video to course
  *     tags: [Courses]
  *     security:
  *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: courseId
- *         required: true
- *         schema:
- *           type: string
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - title
- *             properties:
- *               title:
- *                 type: string
- *     responses:
- *       201:
- *         description: Playlist added
- *       404:
- *         description: Course not found
- */
-router.post('/:courseId/playlists', protect, isAdmin, addPlaylist);
-
-/**
- * @swagger
- * /api/courses/{courseId}/playlists/{playlistId}/videos:
- *   post:
- *     summary: Add video to playlist
- *     tags: [Courses]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: courseId
- *         required: true
- *         schema:
- *           type: string
- *       - in: path
- *         name: playlistId
  *         required: true
  *         schema:
  *           type: string
@@ -174,14 +135,13 @@ router.post('/:courseId/playlists', protect, isAdmin, addPlaylist);
  *               videoUrl:
  *                 type: string
  *               duration:
- *                 type: string
+ *                 type: number
  *     responses:
  *       201:
  *         description: Video added
  *       404:
- *         description: Course or Playlist not found
+ *         description: Course not found
  */
-router.post('/:courseId/playlists/:playlistId/videos', protect, isAdmin, addVideo);
 router.post('/:courseId/videos', protect, isAdmin, addVideo);
 
 export default router;
