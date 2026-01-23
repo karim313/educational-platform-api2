@@ -114,11 +114,23 @@ app.use('*', (req: Request, res: Response) => {
 });
 
 // 5. Global Error Handler
-app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
-    console.error('❌ Server Error:', err.message || err);
-    res.status(500).json({
+app.use((err: any, req: Request, res: Response, _next: NextFunction) => {
+    // Avoid circular reference or object logging issues
+    const errorMessage = err instanceof Error ? err.message : String(err);
+    const errorStack = err instanceof Error ? err.stack : 'No stack trace';
+
+    console.error(`❌ Error [${req.method} ${req.originalUrl}]:`, errorMessage);
+
+    // Only log stack in non-production
+    if (process.env.NODE_ENV !== 'production') {
+        console.error(errorStack);
+    }
+
+    res.status(err.status || 500).json({
         success: false,
-        message: process.env.NODE_ENV === 'development' ? err.message : 'Internal server error',
+        message: process.env.NODE_ENV === 'production'
+            ? 'Internal server error'
+            : errorMessage,
     });
 });
 
