@@ -35,40 +35,44 @@ app.get('/', (_req, res) => {
 // 2. Middlewares
 app.use(helmet());
 app.use(cors({ origin: '*', credentials: true }));
-app.use(express.json());
+
+// Safe JSON Parsing to prevent "Unexpected token o"
+app.use((req, res, next) => {
+    express.json()(req, res, (err) => {
+        if (err) {
+            console.error('❌ JSON Parse Error:', err.message);
+            return res.status(400).json({ success: false, message: 'Invalid JSON payload' });
+        }
+        next();
+    });
+});
+
 app.use(express.urlencoded({ extended: true }));
 
 if (process.env.NODE_ENV !== 'production') {
     app.use(morgan('dev'));
 }
 
-// 3. Swagger Configuration (Wrap in try-catch to avoid crash)
-try {
-    const swaggerOptions = {
-        definition: {
-            openapi: '3.0.0',
-            info: {
-                title: 'Educational Platform API',
-                version: '1.0.0',
-                description: 'API documentation for the Educational Platform',
-            },
-            servers: [
-                {
-                    url: process.env.NODE_ENV === 'production'
-                        ? 'https://educational-platform-api2-production-75ed.up.railway.app'
-                        : `http://localhost:${process.env.PORT || 8080}`,
+// 3. Swagger Configuration (Disabled in production if causing issues)
+if (process.env.NODE_ENV !== 'production') {
+    try {
+        const swaggerOptions = {
+            definition: {
+                openapi: '3.0.0',
+                info: {
+                    title: 'Educational Platform API',
+                    version: '1.0.0',
+                    description: 'API documentation for the Educational Platform',
                 },
-            ],
-        },
-        apis: process.env.NODE_ENV === 'production'
-            ? ['./dist/routes/*.js']
-            : ['./src/routes/*.ts'],
-    };
-
-    const swaggerDocs = swaggerJsdoc(swaggerOptions);
-    app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
-} catch (error) {
-    console.error('⚠️ Swagger failed to load:', error);
+                servers: [{ url: `http://localhost:${process.env.PORT || 8080}` }],
+            },
+            apis: ['./src/routes/*.ts'],
+        };
+        const swaggerDocs = swaggerJsdoc(swaggerOptions);
+        app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+    } catch (error) {
+        console.error('⚠️ Swagger failed:', error);
+    }
 }
 
 // 4. Routes Configuration
