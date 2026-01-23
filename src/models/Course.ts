@@ -6,10 +6,6 @@ interface IVideo {
     duration: number;
 }
 
-interface IPlaylist extends mongoose.Document {
-    title: string;
-    videos: IVideo[];
-}
 
 interface ICourse extends mongoose.Document {
     title: string;
@@ -25,7 +21,6 @@ interface ICourse extends mongoose.Document {
     image: string;
     tag?: string;
     videos: IVideo[];
-    playlists?: mongoose.Types.DocumentArray<IPlaylist>;
 }
 
 const videoSchema = new mongoose.Schema<IVideo>({
@@ -43,13 +38,6 @@ const videoSchema = new mongoose.Schema<IVideo>({
     },
 });
 
-const playlistSchema = new mongoose.Schema<IPlaylist>({
-    title: {
-        type: String,
-        required: [true, 'Please add a playlist title'],
-    },
-    videos: [videoSchema],
-});
 
 const courseSchema = new mongoose.Schema<ICourse>(
     {
@@ -103,7 +91,6 @@ const courseSchema = new mongoose.Schema<ICourse>(
             type: String,
         },
         videos: [videoSchema],
-        playlists: [playlistSchema],
     },
     {
         timestamps: true,
