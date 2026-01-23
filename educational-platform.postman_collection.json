@@ -150,7 +150,7 @@
                         "header": [],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n    \"title\": \"Advanced React & Next.js Masterclass\",\n    \"description\": \"Master the latest features of React and Next.js\",\n    \"instructor\": \"Dr. Sarah Johnson\",\n    \"rating\": 4.9,\n    \"reviews\": 2450,\n    \"hours\": 42,\n    \"lessons\": 156,\n    \"price\": 89.99,\n    \"category\": \"Development\",\n    \"level\": \"Advanced\",\n    \"image\": \"https://images.unsplash.com/photo-1633356122544-f134324a6cee?auto=format&fit=crop&q=80&w=800\",\n    \"tag\": \"Bestseller\"\n}",
+                            "raw": "{\n    \"title\": \"Advanced React & Next.js Masterclass\",\n    \"description\": \"Master the latest features of React and Next.js\",\n    \"instructor\": \"Dr. Sarah Johnson\",\n    \"rating\": 4.9,\n    \"reviews\": 2450,\n    \"hours\": 42,\n    \"lessons\": 156,\n    \"price\": 89.99,\n    \"category\": \"Development\",\n    \"level\": \"Advanced\",\n    \"image\": \"https://images.unsplash.com/photo-1633356122544-f134324a6cee?auto=format&fit=crop&q=80&w=800\",\n    \"tag\": \"Bestseller\",\n    \"videos\": [\n        {\n            \"title\": \"Introduction to the Course\",\n            \"videoUrl\": \"https://www.youtube.com/watch?v=dQw4w9WgXcQ\",\n            \"duration\": 10\n        },\n        {\n            \"title\": \"Setting up Environment\",\n            \"videoUrl\": \"https://www.youtube.com/watch?v=dQw4w9WgXcQ\",\n            \"duration\": 15\n        }\n    ]\n}",
                             "options": {
                                 "raw": {
                                     "language": "json"
@@ -206,7 +206,7 @@
                     "response": []
                 },
                 {
-                    "name": "Add Playlist (Admin)",
+                    "name": "Add Video to Course (Admin)",
                     "request": {
                         "auth": {
                             "type": "bearer",
@@ -222,7 +222,7 @@
                         "header": [],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n    \"title\": \"Getting Started\"\n}",
+                            "raw": "{\n    \"title\": \"New Lesson\",\n    \"videoUrl\": \"https://youtube.com/watch?v=dQw4w9WgXcQ\",\n    \"duration\": 15\n}",
                             "options": {
                                 "raw": {
                                     "language": "json"
@@ -230,7 +230,7 @@
                             }
                         },
                         "url": {
-                            "raw": "https://educational-platform-api2-production-75ed.up.railway.app/api/courses/:courseId/playlists",
+                            "raw": "https://educational-platform-api2-production-75ed.up.railway.app/api/courses/:courseId/videos",
                             "host": [
                                 "https://educational-platform-api2-production-75ed.up.railway.app"
                             ],
@@ -238,62 +238,11 @@
                                 "api",
                                 "courses",
                                 ":courseId",
-                                "playlists"
-                            ],
-                            "variable": [
-                                {
-                                    "key": "courseId",
-                                    "value": ""
-                                }
-                            ]
-                        }
-                    },
-                    "response": []
-                },
-                {
-                    "name": "Add Video to Playlist (Admin)",
-                    "request": {
-                        "auth": {
-                            "type": "bearer",
-                            "bearer": [
-                                {
-                                    "key": "token",
-                                    "value": "{{token}}",
-                                    "type": "string"
-                                }
-                            ]
-                        },
-                        "method": "POST",
-                        "header": [],
-                        "body": {
-                            "mode": "raw",
-                            "raw": "{\n    \"title\": \"Introduction\",\n    \"videoUrl\": \"https://youtube.com/watch?v=123\",\n    \"duration\": \"10:00\"\n}",
-                            "options": {
-                                "raw": {
-                                    "language": "json"
-                                }
-                            }
-                        },
-                        "url": {
-                            "raw": "https://educational-platform-api2-production-75ed.up.railway.app/api/courses/:courseId/playlists/:playlistId/videos",
-                            "host": [
-                                "https://educational-platform-api2-production-75ed.up.railway.app"
-                            ],
-                            "path": [
-                                "api",
-                                "courses",
-                                ":courseId",
-                                "playlists",
-                                ":playlistId",
                                 "videos"
                             ],
                             "variable": [
                                 {
                                     "key": "courseId",
-                                    "value": ""
-                                },
-                                {
-                                    "key": "playlistId",
                                     "value": ""
                                 }
                             ]
