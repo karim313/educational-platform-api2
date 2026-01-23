@@ -75,7 +75,7 @@ app.use((err: any, req: Request, res: Response, _next: NextFunction) => {
 // ==========================================
 // 6. SERVER INITIALIZATION
 // ==========================================
-const PORT = process.env.PORT || 8080;
+const PORT = Number(process.env.PORT) || 8080;
 
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`✅ SERVER IS LIVE ON PORT: ${PORT}`);
