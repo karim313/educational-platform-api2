@@ -150,7 +150,7 @@
                         "header": [],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n    \"title\": \"Advanced TypeScript\",\n    \"description\": \"Learn advanced TS concepts\",\n    \"price\": 99.99\n}",
+                            "raw": "{\n    \"title\": \"Advanced React & Next.js Masterclass\",\n    \"description\": \"Master the latest features of React and Next.js\",\n    \"instructor\": \"Dr. Sarah Johnson\",\n    \"rating\": 4.9,\n    \"reviews\": 2450,\n    \"hours\": 42,\n    \"lessons\": 156,\n    \"price\": 89.99,\n    \"category\": \"Development\",\n    \"level\": \"Advanced\",\n    \"image\": \"https://images.unsplash.com/photo-1633356122544-f134324a6cee?auto=format&fit=crop&q=80&w=800\",\n    \"tag\": \"Bestseller\"\n}",
                             "options": {
                                 "raw": {
                                     "language": "json"

@@ -78,6 +78,37 @@ Returns only courses where `paymentStatus` is `completed`.
 
 ---
 
+## 📚 Course Management
+
+### 1. Create a Course
+`POST /api/courses` - **Admin Protected**
+
+**Request Body:**
+| Field | Type | Required | Description |
+| :--- | :--- | :--- | :--- |
+| `title` | String | Yes | Course title |
+| `description` | String | Yes | Course description |
+| `instructor` | String | Yes | Instructor name |
+| `price` | Number | Yes | Course price |
+| `category` | String | Yes | Course category |
+| `level` | String | Yes | `Beginner`, `Intermediate`, `Advanced`, `All Levels` |
+| `image` | String | Yes | Image URL |
+| `hours` | Number | Yes | Total duration in hours |
+| `lessons` | Number | Yes | Total number of lessons |
+| `rating` | Number | No | Course rating (default 0) |
+| `reviews` | Number | No | Total reviews (default 0) |
+| `tag` | String | No | Optional tag (e.g., "Bestseller") |
+
+**Response (201 Created):**
+```json
+{
+  "success": true,
+  "data": { ... }
+}
+```
+
+---
+
 ## ⚠️ Standard Error Codes
 - **400**: Missing fields or invalid choice.
 - **401**: Unauthorized (Login required).

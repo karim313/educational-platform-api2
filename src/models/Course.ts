@@ -15,6 +15,15 @@ interface ICourse extends mongoose.Document {
     title: string;
     description: string;
     price: number;
+    instructor: string;
+    rating: number;
+    reviews: number;
+    hours: number;
+    lessons: number;
+    category: string;
+    level: string;
+    image: string;
+    tag?: string;
     playlists: mongoose.Types.DocumentArray<IPlaylist>;
 }
 
@@ -55,6 +64,42 @@ const courseSchema = new mongoose.Schema<ICourse>(
         price: {
             type: Number,
             required: [true, 'Please add a course price'],
+        },
+        instructor: {
+            type: String,
+            required: [true, 'Please add an instructor name'],
+        },
+        rating: {
+            type: Number,
+            default: 0,
+        },
+        reviews: {
+            type: Number,
+            default: 0,
+        },
+        hours: {
+            type: Number,
+            required: [true, 'Please add total course hours'],
+        },
+        lessons: {
+            type: Number,
+            required: [true, 'Please add total number of lessons'],
+        },
+        category: {
+            type: String,
+            required: [true, 'Please add a category'],
+        },
+        level: {
+            type: String,
+            required: [true, 'Please add a course level'],
+            enum: ['Beginner', 'Intermediate', 'Advanced', 'All Levels'],
+        },
+        image: {
+            type: String,
+            required: [true, 'Please add a course image URL'],
+        },
+        tag: {
+            type: String,
         },
         playlists: [playlistSchema],
     },

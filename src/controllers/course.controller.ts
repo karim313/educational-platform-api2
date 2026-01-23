@@ -33,11 +33,34 @@ export const getCourseById = async (req: Request, res: Response) => {
 // @access  Private/Admin
 export const createCourse = async (req: Request, res: Response) => {
     try {
-        const { title, description, price } = req.body;
+        const {
+            title,
+            description,
+            price,
+            instructor,
+            rating,
+            reviews,
+            hours,
+            lessons,
+            category,
+            level,
+            image,
+            tag,
+        } = req.body;
+
         const course = await Course.create({
             title,
             description,
             price,
+            instructor,
+            rating,
+            reviews,
+            hours,
+            lessons,
+            category,
+            level,
+            image,
+            tag,
             playlists: [],
         });
         res.status(201).json({ success: true, data: course });
