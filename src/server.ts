@@ -125,8 +125,9 @@ app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
 // 6. Server Initialization
 const PORT = Number(process.env.PORT) || 8080;
 
-app.listen(PORT, () => {
-    console.log(`🚀 Server running on port ${PORT} in ${process.env.NODE_ENV || 'development'} mode`);
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`✅ SERVER IS LIVE ON PORT: ${PORT}`);
+    console.log(`🚀 Mode: ${process.env.NODE_ENV || 'development'}`);
 
     // Background DB connection
     const mongoUri = process.env.MONGO_URI;
