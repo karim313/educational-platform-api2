@@ -18,7 +18,10 @@ import enrollmentRoutes from './routes/enrollment.routes';
 // Create app
 const app: Application = express();
 
-// 1. Healthchecks (MOVE TO TOP to respond fast)
+// ==========================================
+// 1. CRITICAL: HEALTHCHECKS (MUST BE AT TOP)
+// ==========================================
+// Respond to Railway/Healthcheck immediately before any middleware
 app.get('/health', (_req, res) => {
     res.status(200).json({
         status: 'healthy',
@@ -32,19 +35,20 @@ app.get('/', (_req, res) => {
     res.status(200).send('🎓 Edu Platform API is running');
 });
 
-// 2. Middlewares
+// ==========================================
+// 2. MIDDLEWARES
+// ==========================================
 app.use(helmet());
 app.use(cors({ origin: '*', credentials: true }));
 
-// Safe JSON Parsing to prevent "Unexpected token o"
-app.use((req, res, next) => {
-    express.json()(req, res, (err) => {
-        if (err) {
-            console.error('❌ JSON Parse Error:', err.message);
-            return res.status(400).json({ success: false, message: 'Invalid JSON payload' });
-        }
-        next();
-    });
+// Express JSON middleware with error handling
+app.use(express.json());
+app.use((err: any, _req: Request, res: Response, next: NextFunction) => {
+    if (err instanceof SyntaxError && 'body' in err) {
+        console.error('❌ JSON Syntax Error:', err.message);
+        return res.status(400).json({ success: false, message: 'Invalid JSON payload' });
+    }
+    next();
 });
 
 app.use(express.urlencoded({ extended: true }));
@@ -53,7 +57,9 @@ if (process.env.NODE_ENV !== 'production') {
     app.use(morgan('dev'));
 }
 
-// 3. Swagger Configuration (Disabled in production if causing issues)
+// ==========================================
+// 3. SWAGGER (DEVELOPMENT ONLY)
+// ==========================================
 if (process.env.NODE_ENV !== 'production') {
     try {
         const swaggerOptions = {
@@ -75,80 +81,58 @@ if (process.env.NODE_ENV !== 'production') {
     }
 }
 
-// 4. Routes Configuration
+// ==========================================
+// 4. ROUTES
+// ==========================================
 const API_PREFIX = process.env.API_PREFIX || '/api';
-
-// Base root info (already handled above, but keeping for compatibility)
-app.get('/info', (_req, res) => {
-    res.json({
-        success: true,
-        message: '🎓 Edu Platform API info',
-        docs: '/api-docs',
-        endpoints: {
-            auth: ['/api/auth/register', '/api/auth/login'],
-            courses: ['/api/courses'],
-            v1_compatibility: '/api/v1/...'
-        },
-        version: '1.2.0',
-    });
-});
 
 app.get(`${API_PREFIX}/test`, (_req, res) => {
     res.json({ success: true, message: 'API is working 🚀', prefix: API_PREFIX });
 });
 
-// Support both /api and /api/v1 to avoid 404 errors regardless of Railway settings
+// Auth Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/v1/auth', authRoutes);
+
+// Course Routes
 app.use('/api/courses', courseRoutes);
 app.use('/api/v1/courses', courseRoutes);
+
+// Enrollment Routes
 app.use('/api/enrollments', enrollmentRoutes);
 app.use('/api/v1/enrollments', enrollmentRoutes);
-
-// Custom fallback if a different prefix is set in Railway
-if (API_PREFIX !== '/api' && API_PREFIX !== '/api/v1') {
-    app.use(`${API_PREFIX}/auth`, authRoutes);
-    app.use(`${API_PREFIX}/courses`, courseRoutes);
-    app.use(`${API_PREFIX}/enrollments`, enrollmentRoutes);
-}
 
 // 404 handler
 app.use('*', (req: Request, res: Response) => {
     res.status(404).json({ success: false, message: 'Route not found', path: req.originalUrl });
 });
 
-// 5. Global Error Handler
+// ==========================================
+// 5. GLOBAL ERROR HANDLER
+// ==========================================
 app.use((err: any, req: Request, res: Response, _next: NextFunction) => {
-    // Avoid circular reference or object logging issues
     const errorMessage = err instanceof Error ? err.message : String(err);
-    const errorStack = err instanceof Error ? err.stack : 'No stack trace';
-
     console.error(`❌ Error [${req.method} ${req.originalUrl}]:`, errorMessage);
-
-    // Only log stack in non-production
-    if (process.env.NODE_ENV !== 'production') {
-        console.error(errorStack);
-    }
 
     res.status(err.status || 500).json({
         success: false,
-        message: process.env.NODE_ENV === 'production'
-            ? 'Internal server error'
-            : errorMessage,
+        message: process.env.NODE_ENV === 'production' ? 'Internal server error' : errorMessage,
     });
 });
 
-// 6. Server Initialization
+// ==========================================
+// 6. SERVER INITIALIZATION
+// ==========================================
 const PORT = Number(process.env.PORT) || 8080;
 
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`✅ SERVER IS LIVE ON PORT: ${PORT}`);
-    console.log(`🚀 Mode: ${process.env.NODE_ENV || 'development'}`);
+    console.log(`🚀 Mode: ${process.env.NODE_ENV || 'production'}`);
 
     // Background DB connection
     const mongoUri = process.env.MONGO_URI;
     if (!mongoUri) {
-        console.error('❌ CRITICAL: MONGO_URI is not defined!');
+        console.warn('⚠️ Warning: MONGO_URI is not defined! Application may fail on DB-dependent routes.');
     } else {
         mongoose.connect(mongoUri)
             .then(() => console.log('✅ MongoDB Connected'))
@@ -156,28 +140,13 @@ app.listen(PORT, '0.0.0.0', () => {
     }
 });
 
-// 7. Process error handlers
+// Error process handlers
 process.on('uncaughtException', (err) => {
     console.error('🔥 CRITICAL: Uncaught Exception:', err);
 });
 
 process.on('unhandledRejection', (reason) => {
     console.error('🔥 CRITICAL: Unhandled Rejection:', reason);
-});
-
-// Graceful shutdown
-process.on('SIGTERM', async () => {
-    console.log('🛑 SIGTERM received. Closing MongoDB...');
-    await mongoose.connection.close();
-    console.log('✅ MongoDB closed. Exiting...');
-    process.exit(0);
-});
-
-process.on('SIGINT', async () => {
-    console.log('🛑 SIGINT received. Closing MongoDB...');
-    await mongoose.connection.close();
-    console.log('✅ MongoDB closed. Exiting...');
-    process.exit(0);
 });
 
 export default app;
