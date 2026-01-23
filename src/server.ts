@@ -7,18 +7,18 @@ import morgan from 'morgan';
 import swaggerUi from 'swagger-ui-express';
 import swaggerJsdoc from 'swagger-jsdoc';
 
+// Load env as early as possible
+dotenv.config();
+
 // Route imports
 import authRoutes from './routes/auth.routes';
 import courseRoutes from './routes/course.routes';
 import enrollmentRoutes from './routes/enrollment.routes';
 
-// Load env first
-dotenv.config();
-
 // Create app
 const app: Application = express();
 
-// 1. Healthcheck (RESPOND ASAP to Railway)
+// 1. Healthchecks (MOVE TO TOP to respond fast)
 app.get('/health', (_req, res) => {
     res.status(200).json({
         status: 'healthy',
@@ -26,6 +26,10 @@ app.get('/health', (_req, res) => {
         uptime: process.uptime(),
         timestamp: new Date().toISOString()
     });
+});
+
+app.get('/', (_req, res) => {
+    res.status(200).send('🎓 Edu Platform API is running');
 });
 
 // 2. Middlewares
@@ -56,7 +60,9 @@ try {
                 },
             ],
         },
-        apis: ['./src/routes/*.ts', './dist/routes/*.js'],
+        apis: process.env.NODE_ENV === 'production'
+            ? ['./dist/routes/*.js']
+            : ['./src/routes/*.ts'],
     };
 
     const swaggerDocs = swaggerJsdoc(swaggerOptions);
@@ -68,11 +74,11 @@ try {
 // 4. Routes Configuration
 const API_PREFIX = process.env.API_PREFIX || '/api';
 
-// Base root info
-app.get('/', (_req, res) => {
+// Base root info (already handled above, but keeping for compatibility)
+app.get('/info', (_req, res) => {
     res.json({
         success: true,
-        message: '🎓 Edu Platform API is running',
+        message: '🎓 Edu Platform API info',
         docs: '/api-docs',
         endpoints: {
             auth: ['/api/auth/register', '/api/auth/login'],
@@ -119,7 +125,7 @@ app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
 // 6. Server Initialization
 const PORT = Number(process.env.PORT) || 8080;
 
-app.listen(PORT, '0.0.0.0', () => {
+app.listen(PORT, () => {
     console.log(`🚀 Server running on port ${PORT} in ${process.env.NODE_ENV || 'development'} mode`);
 
     // Background DB connection
