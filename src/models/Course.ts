@@ -24,7 +24,8 @@ interface ICourse extends mongoose.Document {
     level: string;
     image: string;
     tag?: string;
-    playlists: mongoose.Types.DocumentArray<IPlaylist>;
+    videos: IVideo[];
+    playlists?: mongoose.Types.DocumentArray<IPlaylist>;
 }
 
 const videoSchema = new mongoose.Schema<IVideo>({
@@ -101,6 +102,7 @@ const courseSchema = new mongoose.Schema<ICourse>(
         tag: {
             type: String,
         },
+        videos: [videoSchema],
         playlists: [playlistSchema],
     },
     {

@@ -182,5 +182,6 @@ router.post('/:courseId/playlists', protect, isAdmin, addPlaylist);
  *         description: Course or Playlist not found
  */
 router.post('/:courseId/playlists/:playlistId/videos', protect, isAdmin, addVideo);
+router.post('/:courseId/videos', protect, isAdmin, addVideo);
 
 export default router;

@@ -46,6 +46,7 @@ export const createCourse = async (req: Request, res: Response) => {
             level,
             image,
             tag,
+            videos,
         } = req.body;
 
         const course = await Course.create({
@@ -61,6 +62,7 @@ export const createCourse = async (req: Request, res: Response) => {
             level,
             image,
             tag,
+            videos: videos || [],
             playlists: [],
         });
         res.status(201).json({ success: true, data: course });
@@ -96,7 +98,11 @@ export const addPlaylist = async (req: Request, res: Response) => {
             return res.status(404).json({ success: false, message: 'Course not found' });
         }
 
-        course.playlists.push({ title, videos: [] } as any);
+        if (!course.playlists) {
+            course.playlists = [] as any;
+        }
+
+        course.playlists!.push({ title, videos: [] } as any);
         await course.save();
 
         res.status(201).json({ success: true, data: course });
@@ -105,27 +111,39 @@ export const addPlaylist = async (req: Request, res: Response) => {
     }
 };
 
-// @desc    Add video to playlist
+// @desc    Add video to course or playlist
+// @route   POST /api/courses/:courseId/videos
 // @route   POST /api/courses/:courseId/playlists/:playlistId/videos
 // @access  Private/Admin
 export const addVideo = async (req: Request, res: Response) => {
     try {
         const { title, videoUrl, duration } = req.body;
-        const course = await Course.findById(req.params.courseId);
+        const { courseId, playlistId } = req.params;
+        const course = await Course.findById(courseId);
 
         if (!course) {
             return res.status(404).json({ success: false, message: 'Course not found' });
         }
 
-        const playlist = course.playlists.id(req.params.playlistId);
-
-        if (!playlist) {
-            return res.status(404).json({ success: false, message: 'Playlist not found' });
+        if (playlistId) {
+            // Add to specific playlist
+            if (!course.playlists) {
+                return res.status(404).json({ success: false, message: 'No playlists found in this course' });
+            }
+            const playlist = course.playlists.id(playlistId);
+            if (!playlist) {
+                return res.status(404).json({ success: false, message: 'Playlist not found' });
+            }
+            playlist.videos.push({ title, videoUrl, duration });
+        } else {
+            // Add directly to course
+            if (!course.videos) {
+                course.videos = [];
+            }
+            course.videos.push({ title, videoUrl, duration });
         }
 
-        playlist.videos.push({ title, videoUrl, duration });
         await course.save();
-
         res.status(201).json({ success: true, data: course });
     } catch (error) {
         res.status(500).json({ success: false, message: (error as Error).message });

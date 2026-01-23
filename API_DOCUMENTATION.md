@@ -98,6 +98,7 @@ Returns only courses where `paymentStatus` is `completed`.
 | `rating` | Number | No | Course rating (default 0) |
 | `reviews` | Number | No | Total reviews (default 0) |
 | `tag` | String | No | Optional tag (e.g., "Bestseller") |
+| `videos` | Array | No | Array of video objects `{title, videoUrl, duration}` |
 
 **Response (201 Created):**
 ```json
@@ -106,6 +107,23 @@ Returns only courses where `paymentStatus` is `completed`.
   "data": { ... }
 }
 ```
+
+---
+
+### 2. Add Video to Course
+`POST /api/courses/:courseId/videos` - **Admin Protected**
+
+**Request Body:**
+```json
+{
+  "title": "Introduction",
+  "videoUrl": "https://...",
+  "duration": 10
+}
+```
+
+### 3. Add Video to Playlist
+`POST /api/courses/:courseId/playlists/:playlistId/videos` - **Admin Protected**
 
 ---
 
