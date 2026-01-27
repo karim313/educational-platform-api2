@@ -81,7 +81,7 @@ Returns only courses where `paymentStatus` is `completed`.
 ## 📚 Course Management
 
 ### 1. Create a Course
-`POST /api/courses` - **Admin Protected**
+`POST /api/courses` - **Admin/Teacher Protected**
 
 **Request Body:**
 | Field | Type | Required | Description |
@@ -110,8 +110,15 @@ Returns only courses where `paymentStatus` is `completed`.
 
 ---
 
-### 2. Add Video to Course
-`POST /api/courses/:courseId/videos` - **Admin Protected**
+### 2. Update Course
+`PUT /api/courses/:courseId` - **Admin/Teacher Protected**
+
+Update any course field (title, price, image, etc).
+
+---
+
+### 3. Add Video to Course
+`POST /api/courses/:courseId/videos` - **Admin/Teacher Protected**
 
 **Request Body:**
 ```json
@@ -122,13 +129,20 @@ Returns only courses where `paymentStatus` is `completed`.
 }
 ```
 
-### 3. Add Video to Playlist
-`POST /api/courses/:courseId/playlists/:playlistId/videos` - **Admin Protected**
+---
+
+### 4. Delete Video from Course
+`DELETE /api/courses/:courseId/videos/:videoId` - **Admin/Teacher Protected**
+
+---
+
+### 5. Delete Course
+`DELETE /api/courses/:courseId` - **Admin Protected Only**
 
 ---
 
 ## ⚠️ Standard Error Codes
 - **400**: Missing fields or invalid choice.
 - **401**: Unauthorized (Login required).
-- **403**: Forbidden (Admin required).
-- **404**: Course not found.
+- **403**: Forbidden (Insufficient permissions).
+- **404**: Course/Enrollment not found.
