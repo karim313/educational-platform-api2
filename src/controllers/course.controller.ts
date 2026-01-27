@@ -70,6 +70,24 @@ export const createCourse = async (req: Request, res: Response) => {
     }
 };
 
+// @desc    Update a course
+// @route   PUT /api/courses/:courseId
+// @access  Private/Admin
+export const updateCourse = async (req: Request, res: Response) => {
+    try {
+        const course = await Course.findByIdAndUpdate(req.params.courseId, req.body, {
+            new: true,
+            runValidators: true,
+        });
+        if (!course) {
+            return res.status(404).json({ success: false, message: 'Course not found' });
+        }
+        res.json({ success: true, data: course });
+    } catch (error) {
+        res.status(500).json({ success: false, message: (error as Error).message });
+    }
+};
+
 // @desc    Delete a course
 // @route   DELETE /api/courses/:courseId
 // @access  Private/Admin
@@ -112,3 +130,26 @@ export const addVideo = async (req: Request, res: Response) => {
         res.status(500).json({ success: false, message: (error as Error).message });
     }
 };
+
+// @desc    Delete video from course
+// @route   DELETE /api/courses/:courseId/videos/:videoId
+// @access  Private/Admin/Teacher
+export const deleteVideo = async (req: Request, res: Response) => {
+    try {
+        const { courseId, videoId } = req.params;
+        const course = await Course.findById(courseId);
+
+        if (!course) {
+            return res.status(404).json({ success: false, message: 'Course not found' });
+        }
+
+        // Filter out the video with the given videoId
+        course.videos = course.videos.filter((v: any) => v._id.toString() !== videoId);
+
+        await course.save();
+        res.json({ success: true, data: course });
+    } catch (error) {
+        res.status(500).json({ success: false, message: (error as Error).message });
+    }
+};
+

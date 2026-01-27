@@ -3,11 +3,14 @@ import {
     getCourses,
     getCourseById,
     createCourse,
+    updateCourse,
     deleteCourse,
     addVideo,
+    deleteVideo,
 } from '../controllers/course.controller';
 import { protect } from '../middleware/auth';
 import { isAdmin } from '../middleware/isAdmin';
+import { authorize } from '../middleware/authorize';
 
 const router = express.Router();
 
@@ -84,6 +87,33 @@ router.post('/', protect, isAdmin, createCourse);
 /**
  * @swagger
  * /api/courses/{courseId}:
+ *   put:
+ *     summary: Update a course
+ *     tags: [Courses]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: courseId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Course'
+ *     responses:
+ *       200:
+ *         description: Course updated
+ *       404:
+ *         description: Course not found
+ */
+router.put('/:courseId', protect, authorize('admin', 'teacher'), updateCourse);
+
+/**
+ * @swagger
+ * /api/courses/{courseId}:
  *   delete:
  *     summary: Delete a course
  *     tags: [Courses]
@@ -142,6 +172,29 @@ router.delete('/:courseId', protect, isAdmin, deleteCourse);
  *       404:
  *         description: Course not found
  */
-router.post('/:courseId/videos', protect, isAdmin, addVideo);
+router.post('/:courseId/videos', protect, authorize('admin', 'teacher'), addVideo);
+
+/**
+ * @swagger
+ * /api/courses/{courseId}/videos/{videoId}:
+ *   delete:
+ *     summary: Delete video from course
+ *     tags: [Courses]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: courseId
+ *         required: true
+ *       - in: path
+ *         name: videoId
+ *         required: true
+ *     responses:
+ *       200:
+ *         description: Video deleted
+ *       404:
+ *         description: Course not found
+ */
+router.delete('/:courseId/videos/:videoId', protect, authorize('admin', 'teacher'), deleteVideo);
 
 export default router;
