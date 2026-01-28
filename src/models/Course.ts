@@ -72,6 +72,7 @@ const courseSchema = new mongoose.Schema<ICourse>(
         instructor: {
             type: String,
             required: [true, 'Please add an instructor name'],
+            default: 'Admin Instructor',
         },
         rating: {
             type: Number,
@@ -84,32 +85,45 @@ const courseSchema = new mongoose.Schema<ICourse>(
         hours: {
             type: Number,
             required: [true, 'Please add total course hours'],
+            default: 0,
         },
         lessons: {
             type: Number,
             required: [true, 'Please add total number of lessons'],
+            default: 0,
         },
         category: {
             type: String,
             required: [true, 'Please add a category'],
+            default: 'General',
         },
         level: {
             type: String,
             required: [true, 'Please add a course level'],
             enum: ['Beginner', 'Intermediate', 'Advanced', 'All Levels'],
+            default: 'All Levels',
         },
         image: {
             type: String,
             required: [true, 'Please add a course image URL'],
+            default: 'https://images.unsplash.com/photo-1501504905252-473c47e087f8?auto=format&fit=crop&q=80&w=800',
         },
         imageCover: {
             type: String,
+            default: 'https://images.unsplash.com/photo-1501504905252-473c47e087f8?auto=format&fit=crop&q=80&w=1200',
         },
         tag: {
             type: String,
+            default: '',
         },
-        videos: [videoSchema],
-        playlists: [playlistSchema],
+        videos: {
+            type: [videoSchema],
+            default: [],
+        },
+        playlists: {
+            type: [playlistSchema],
+            default: [],
+        },
     },
     {
         timestamps: true,
