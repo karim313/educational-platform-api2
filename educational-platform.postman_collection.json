@@ -24,9 +24,9 @@
                             }
                         },
                         "url": {
-                            "raw": "https://educational-platform-api2-production-75ed.up.railway.app/api/auth/register",
+                            "raw": "{{baseUrl}}/api/auth/register",
                             "host": [
-                                "https://educational-platform-api2-production-75ed.up.railway.app"
+                                "{{baseUrl}}"
                             ],
                             "path": [
                                 "api",
@@ -52,9 +52,9 @@
                             }
                         },
                         "url": {
-                            "raw": "https://educational-platform-api2-production-75ed.up.railway.app/api/auth/login",
+                            "raw": "{{baseUrl}}/api/auth/login",
                             "host": [
-                                "https://educational-platform-api2-production-75ed.up.railway.app"
+                                "{{baseUrl}}"
                             ],
                             "path": [
                                 "api",
@@ -86,9 +86,9 @@
                         "method": "GET",
                         "header": [],
                         "url": {
-                            "raw": "https://educational-platform-api2-production-75ed.up.railway.app/api/courses",
+                            "raw": "{{baseUrl}}/api/courses",
                             "host": [
-                                "https://educational-platform-api2-production-75ed.up.railway.app"
+                                "{{baseUrl}}"
                             ],
                             "path": [
                                 "api",
@@ -114,53 +114,9 @@
                         "method": "GET",
                         "header": [],
                         "url": {
-                            "raw": "https://educational-platform-api2-production-75ed.up.railway.app/api/courses/:courseId",
+                            "raw": "{{baseUrl}}/api/courses/:courseId",
                             "host": [
-                                "https://educational-platform-api2-production-75ed.up.railway.app"
-                            ],
-                            "path": [
-                                "api",
-                                "courses",
-                                ":courseId"
-                            ],
-                            "variable": [
-                                {
-                                    "key": "courseId",
-                                    "value": ""
-                                }
-                            ]
-                        }
-                    },
-                    "response": []
-                },
-                {
-                    "name": "Update Course (Instructor/Admin)",
-                    "request": {
-                        "auth": {
-                            "type": "bearer",
-                            "bearer": [
-                                {
-                                    "key": "token",
-                                    "value": "{{token}}",
-                                    "type": "string"
-                                }
-                            ]
-                        },
-                        "method": "PUT",
-                        "header": [],
-                        "body": {
-                            "mode": "raw",
-                            "raw": "{\n    \"title\": \"Updated Course Title\",\n    \"price\": 99.99,\n    \"imageCover\": \"https://images.unsplash.com/photo-1633356122544-f134324a6cee?auto=format&fit=crop&q=80&w=1200\"\n}",
-                            "options": {
-                                "raw": {
-                                    "language": "json"
-                                }
-                            }
-                        },
-                        "url": {
-                            "raw": "https://educational-platform-api2-production-75ed.up.railway.app/api/courses/:courseId",
-                            "host": [
-                                "https://educational-platform-api2-production-75ed.up.railway.app"
+                                "{{baseUrl}}"
                             ],
                             "path": [
                                 "api",
@@ -202,13 +158,57 @@
                             }
                         },
                         "url": {
-                            "raw": "https://educational-platform-api2-production-75ed.up.railway.app/api/courses",
+                            "raw": "{{baseUrl}}/api/courses",
                             "host": [
-                                "https://educational-platform-api2-production-75ed.up.railway.app"
+                                "{{baseUrl}}"
                             ],
                             "path": [
                                 "api",
                                 "courses"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Update Course (Instructor/Admin)",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "PUT",
+                        "header": [],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"title\": \"Updated Course Title\",\n    \"description\": \"Updated description\",\n    \"price\": 99.99,\n    \"imageCover\": \"https://images.unsplash.com/photo-1633356122544-f134324a6cee?auto=format&fit=crop&q=80&w=1200\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/api/courses/:courseId",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "courses",
+                                ":courseId"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "courseId",
+                                    "value": ""
+                                }
                             ]
                         }
                     },
@@ -230,9 +230,9 @@
                         "method": "DELETE",
                         "header": [],
                         "url": {
-                            "raw": "https://educational-platform-api2-production-75ed.up.railway.app/api/courses/:courseId",
+                            "raw": "{{baseUrl}}/api/courses/:courseId",
                             "host": [
-                                "https://educational-platform-api2-production-75ed.up.railway.app"
+                                "{{baseUrl}}"
                             ],
                             "path": [
                                 "api",
@@ -274,9 +274,9 @@
                             }
                         },
                         "url": {
-                            "raw": "https://educational-platform-api2-production-75ed.up.railway.app/api/courses/:courseId/videos",
+                            "raw": "{{baseUrl}}/api/courses/:courseId/videos",
                             "host": [
-                                "https://educational-platform-api2-production-75ed.up.railway.app"
+                                "{{baseUrl}}"
                             ],
                             "path": [
                                 "api",
@@ -319,9 +319,9 @@
                             }
                         },
                         "url": {
-                            "raw": "https://educational-platform-api2-production-75ed.up.railway.app/api/courses/:courseId/playlists/:playlistId/videos",
+                            "raw": "{{baseUrl}}/api/courses/:courseId/playlists/:playlistId/videos",
                             "host": [
-                                "https://educational-platform-api2-production-75ed.up.railway.app"
+                                "{{baseUrl}}"
                             ],
                             "path": [
                                 "api",
@@ -361,9 +361,9 @@
                         "method": "DELETE",
                         "header": [],
                         "url": {
-                            "raw": "https://educational-platform-api2-production-75ed.up.railway.app/api/courses/:courseId/videos/:videoId",
+                            "raw": "{{baseUrl}}/api/courses/:courseId/videos/:videoId",
                             "host": [
-                                "https://educational-platform-api2-production-75ed.up.railway.app"
+                                "{{baseUrl}}"
                             ],
                             "path": [
                                 "api",
@@ -416,9 +416,9 @@
                             }
                         },
                         "url": {
-                            "raw": "https://educational-platform-api2-production-75ed.up.railway.app/api/enrollments/purchase/:courseId",
+                            "raw": "{{baseUrl}}/api/enrollments/purchase/:courseId",
                             "host": [
-                                "https://educational-platform-api2-production-75ed.up.railway.app"
+                                "{{baseUrl}}"
                             ],
                             "path": [
                                 "api",
@@ -461,9 +461,9 @@
                             }
                         },
                         "url": {
-                            "raw": "https://educational-platform-api2-production-75ed.up.railway.app/api/enrollments/purchase/:courseId",
+                            "raw": "{{baseUrl}}/api/enrollments/purchase/:courseId",
                             "host": [
-                                "https://educational-platform-api2-production-75ed.up.railway.app"
+                                "{{baseUrl}}"
                             ],
                             "path": [
                                 "api",
@@ -506,9 +506,9 @@
                             }
                         },
                         "url": {
-                            "raw": "https://educational-platform-api2-production-75ed.up.railway.app/api/enrollments/verify/:enrollmentId",
+                            "raw": "{{baseUrl}}/api/enrollments/verify/:enrollmentId",
                             "host": [
-                                "https://educational-platform-api2-production-75ed.up.railway.app"
+                                "{{baseUrl}}"
                             ],
                             "path": [
                                 "api",
@@ -542,9 +542,9 @@
                         "method": "GET",
                         "header": [],
                         "url": {
-                            "raw": "https://educational-platform-api2-production-75ed.up.railway.app/api/enrollments/my-courses",
+                            "raw": "{{baseUrl}}/api/enrollments/my-courses",
                             "host": [
-                                "https://educational-platform-api2-production-75ed.up.railway.app"
+                                "{{baseUrl}}"
                             ],
                             "path": [
                                 "api",
