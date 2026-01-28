@@ -173,6 +173,7 @@ router.delete('/:courseId', protect, isAdmin, deleteCourse);
  *         description: Course not found
  */
 router.post('/:courseId/videos', protect, authorize('admin', 'teacher'), addVideo);
+router.post('/:courseId/playlists/:playlistId/videos', protect, authorize('admin', 'teacher'), addVideo);
 
 /**
  * @swagger

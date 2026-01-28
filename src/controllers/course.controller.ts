@@ -122,11 +122,21 @@ export const addVideo = async (req: Request, res: Response) => {
             return res.status(404).json({ success: false, message: 'Course not found' });
         }
 
-        // Add directly to course
-        if (!course.videos) {
-            course.videos = [];
+        if (playlistId) {
+            // Find the playlist
+            const playlist = course.playlists.find(p => (p as any)._id.toString() === playlistId);
+            if (!playlist) {
+                return res.status(404).json({ success: false, message: 'Playlist not found' });
+            }
+            if (!playlist.videos) playlist.videos = [];
+            playlist.videos.push({ title, videoUrl, duration });
+        } else {
+            // Add directly to course videos array
+            if (!course.videos) {
+                course.videos = [];
+            }
+            course.videos.push({ title, videoUrl, duration });
         }
-        course.videos.push({ title, videoUrl, duration });
 
         await course.save();
         res.status(201).json({ success: true, data: course });
