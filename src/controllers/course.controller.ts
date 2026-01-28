@@ -45,8 +45,10 @@ export const createCourse = async (req: Request, res: Response) => {
             category,
             level,
             image,
+            imageCover,
             tag,
             videos,
+            playlists,
         } = req.body;
 
         const course = await Course.create({
@@ -61,8 +63,10 @@ export const createCourse = async (req: Request, res: Response) => {
             category,
             level,
             image,
+            imageCover: imageCover || image, // Default to image if imageCover not provided
             tag,
             videos: videos || [],
+            playlists: playlists || [],
         });
         res.status(201).json({ success: true, data: course });
     } catch (error) {

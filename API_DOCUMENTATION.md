@@ -93,12 +93,14 @@ Returns only courses where `paymentStatus` is `completed`.
 | `category` | String | Yes | Course category |
 | `level` | String | Yes | `Beginner`, `Intermediate`, `Advanced`, `All Levels` |
 | `image` | String | Yes | Image URL |
+| `imageCover` | String | No | Cover image URL (defaults to `image` if not provided) |
 | `hours` | Number | Yes | Total duration in hours |
 | `lessons` | Number | Yes | Total number of lessons |
 | `rating` | Number | No | Course rating (default 0) |
 | `reviews` | Number | No | Total reviews (default 0) |
 | `tag` | String | No | Optional tag (e.g., "Bestseller") |
 | `videos` | Array | No | Array of video objects `{title, videoUrl, duration}` |
+| `playlists` | Array | No | Array of playlist objects `{title, videos: []}` |
 
 **Response (201 Created):**
 ```json
