@@ -3,15 +3,27 @@ import Enrollment from '../models/Enrollment';
 import Course from '../models/Course';
 import Stripe from 'stripe';
 
-const stripeSecretKey = process.env.STRIPE_SECRET_KEY || '';
+// Use env variable
+const getStripeKey = () => {
+    const key = process.env.STRIPE_SECRET_KEY;
+    if (!key || key === 'null' || key === 'undefined' || key === '') {
+        return null;
+    }
+    return key;
+};
+
+const stripeSecretKey = getStripeKey();
 let stripe: Stripe | null = null;
 
-if (stripeSecretKey) {
-    stripe = new Stripe(stripeSecretKey, {
-        apiVersion: '2023-10-16' as any,
-    });
-} else {
-    console.warn('⚠️ STRIPE_SECRET_KEY is missing. Payment features will be disabled.');
+try {
+    if (stripeSecretKey) {
+        stripe = new Stripe(stripeSecretKey, {
+            apiVersion: '2023-10-16' as any,
+        });
+        console.log('✅ Stripe initialized successfully');
+    }
+} catch (error) {
+    console.error('❌ Stripe initialization failed:', error);
 }
 
 /**
@@ -49,7 +61,7 @@ export const purchaseCourse = async (req: Request, res: Response) => {
             if (!stripe) {
                 return res.status(500).json({
                     success: false,
-                    message: 'Stripe is not configured on the server. Please check environment variables.'
+                    message: 'Stripe is currently unavailable on this server. Please ensure the API key is set correctly in settings.'
                 });
             }
             const session = await stripe.checkout.sessions.create({
@@ -101,7 +113,7 @@ export const purchaseCourse = async (req: Request, res: Response) => {
 
         // 4. Handle Vodafone Cash Payment
         if (paymentMethod === 'vodafone_cash') {
-            const vcNumber = process.env.VODAFONE_CASH_NUMBER || '010XXXXXXXX';
+            const vcNumber = process.env.VODAFONE_CASH_NUMBER || '01012345678';
             if (!transactionId) {
                 return res.status(400).json({
                     success: false,
