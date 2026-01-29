@@ -6,6 +6,8 @@ import {
     updateCourse,
     deleteCourse,
     addVideo,
+    getVideos,
+    getPlaylistVideos,
     deleteVideo,
     deleteAllVideos,
     deleteAllCourses,
@@ -27,6 +29,8 @@ router.delete('/:courseId', protect, isAdmin, deleteCourse);
 router.delete('/', protect, isAdmin, deleteAllCourses);
 
 // Video management
+router.get('/:courseId/videos', getVideos);
+router.get('/:courseId/playlists/:playlistId/videos', getPlaylistVideos);
 router.post('/:courseId/videos', protect, authorize('admin', 'teacher'), addVideo);
 router.post('/:courseId/playlists/:playlistId/videos', protect, authorize('admin', 'teacher'), addVideo);
 router.delete('/:courseId/videos/:videoId', protect, authorize('admin', 'teacher'), deleteVideo);

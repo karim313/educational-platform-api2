@@ -145,6 +145,44 @@ export const addVideo = async (req: Request, res: Response) => {
     }
 };
 
+// @desc    Get all videos for a course
+// @route   GET /api/courses/:courseId/videos
+// @access  Public
+export const getVideos = async (req: Request, res: Response) => {
+    try {
+        const course = await Course.findById(req.params.courseId);
+        if (!course) {
+            return res.status(404).json({ success: false, message: 'Course not found' });
+        }
+        res.json({ success: true, count: course.videos.length, data: course.videos });
+    } catch (error) {
+        res.status(500).json({ success: false, message: (error as Error).message });
+    }
+};
+
+// @desc    Get videos from a specific playlist
+// @route   GET /api/courses/:courseId/playlists/:playlistId/videos
+// @access  Public
+export const getPlaylistVideos = async (req: Request, res: Response) => {
+    try {
+        const { courseId, playlistId } = req.params;
+        const course = await Course.findById(courseId);
+
+        if (!course) {
+            return res.status(404).json({ success: false, message: 'Course not found' });
+        }
+
+        const playlist = (course.playlists as any).id(playlistId);
+        if (!playlist) {
+            return res.status(404).json({ success: false, message: 'Playlist not found' });
+        }
+
+        res.json({ success: true, count: playlist.videos.length, data: playlist.videos });
+    } catch (error) {
+        res.status(500).json({ success: false, message: (error as Error).message });
+    }
+};
+
 // @desc    Delete video from course
 // @route   DELETE /api/courses/:courseId/videos/:videoId
 // @access  Private/Admin/Teacher
