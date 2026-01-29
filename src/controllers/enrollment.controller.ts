@@ -101,10 +101,11 @@ export const purchaseCourse = async (req: Request, res: Response) => {
 
         // 4. Handle Vodafone Cash Payment
         if (paymentMethod === 'vodafone_cash') {
+            const vcNumber = process.env.VODAFONE_CASH_NUMBER || '010XXXXXXXX';
             if (!transactionId) {
                 return res.status(400).json({
                     success: false,
-                    message: `Please provide the transaction ID after transferring to ${process.env.VODAFONE_CASH_NUMBER || 'our number'}`
+                    message: `To enroll, please transfer the course price to Vodafone Cash: ${vcNumber}. Once done, send the Transaction ID here to complete your request.`
                 });
             }
 
