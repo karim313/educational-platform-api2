@@ -14,6 +14,7 @@ dotenv.config();
 import authRoutes from './routes/auth.routes';
 import courseRoutes from './routes/course.routes';
 import enrollmentRoutes from './routes/enrollment.routes';
+import instructorRoutes from './routes/instructor.routes';
 
 const app: Application = express();
 
@@ -48,6 +49,7 @@ const API_PREFIX = process.env.API_PREFIX || '/api';
 app.use('/api/auth', authRoutes);
 app.use('/api/courses', courseRoutes);
 app.use('/api/enrollments', enrollmentRoutes);
+app.use('/api/instructor', instructorRoutes);
 
 // Test route
 app.get(`${API_PREFIX}/test`, (_req, res) => {

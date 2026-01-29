@@ -167,3 +167,41 @@ export const deleteVideo = async (req: Request, res: Response) => {
     }
 };
 
+// @desc    Delete all videos from a course
+// @route   DELETE /api/courses/:courseId/videos
+// @access  Private/Admin/Teacher
+export const deleteAllVideos = async (req: Request, res: Response) => {
+    try {
+        const course = await Course.findById(req.params.courseId);
+
+        if (!course) {
+            return res.status(404).json({ success: false, message: 'Course not found' });
+        }
+
+        course.videos = [];
+        // Clear videos from all playlists too
+        if (course.playlists) {
+            course.playlists.forEach(playlist => {
+                playlist.videos = [];
+            });
+        }
+
+        await course.save();
+        res.json({ success: true, message: 'All videos deleted from course', data: course });
+    } catch (error) {
+        res.status(500).json({ success: false, message: (error as Error).message });
+    }
+};
+
+// @desc    Delete all courses
+// @route   DELETE /api/courses
+// @access  Private/Admin
+export const deleteAllCourses = async (req: Request, res: Response) => {
+    try {
+        await Course.deleteMany({});
+        res.json({ success: true, message: 'All courses deleted' });
+    } catch (error) {
+        res.status(500).json({ success: false, message: (error as Error).message });
+    }
+};
+

@@ -143,8 +143,23 @@ Update any course field (title, price, image, etc).
 
 ---
 
-## ⚠️ Standard Error Codes
-- **400**: Missing fields or invalid choice.
-- **401**: Unauthorized (Login required).
-- **403**: Forbidden (Insufficient permissions).
-- **404**: Course/Enrollment not found.
+### Video Management
+- `POST /api/courses/:courseId/videos`: Add video directly to course.
+- `POST /api/courses/:courseId/playlists/:playlistId/videos`: Add video to specific playlist.
+- `DELETE /api/courses/:courseId/videos/:videoId`: Delete specific video.
+- `DELETE /api/courses/:courseId/videos`: Delete all videos from a course.
+
+### Instructor Dashboard
+- `GET /api/instructor/users`: Get list of all users and their enrollment stats (Admin/Teacher only).
+
+### Bulk Actions
+- `DELETE /api/courses`: Delete all courses (Admin only).
+
+## Standard Error Codes
+| Code | Description |
+| --- | --- |
+| `400` | Bad Request (Validation error or already enrolled) |
+| `401` | Unauthorized (Missing or invalid token) |
+| `403` | Forbidden (Insufficient permissions) |
+| `404` | Not Found (Resource doesn't exist) |
+| `500` | Internal Server Error |
