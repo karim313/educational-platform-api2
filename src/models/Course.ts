@@ -1,18 +1,18 @@
 import mongoose from 'mongoose';
 
-interface IVideo {
+export interface IVideo {
     title: string;
     videoUrl: string;
     duration: number;
 }
 
 
-interface IPlaylist {
+export interface IPlaylist {
     title: string;
     videos: IVideo[];
 }
 
-interface ICourse extends mongoose.Document {
+export interface ICourse extends mongoose.Document {
     title: string;
     description: string;
     price: number;

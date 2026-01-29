@@ -81,17 +81,26 @@ app.use((err: any, req: Request, res: Response, _next: NextFunction) => {
 // ==========================================
 const PORT = Number(process.env.PORT) || 8080;
 
-app.listen(PORT, '0.0.0.0', () => {
+const server = app.listen(PORT, () => {
     console.log(`✅ SERVER IS LIVE ON PORT: ${PORT}`);
 
+    // Connect to MongoDB AFTER the server starts listening
     const mongoUri = process.env.MONGO_URI;
     if (mongoUri) {
         mongoose.connect(mongoUri)
             .then(() => console.log('✅ MongoDB Connected'))
-            .catch(err => console.error('❌ MongoDB Connection Failed:', err));
+            .catch(err => {
+                console.error('❌ MongoDB Connection Failed:', err);
+                // Don't exit process, let healthcheck reflect status if needed
+            });
     } else {
         console.warn('⚠️ MONGO_URI missing');
     }
+});
+
+// Handle server errors
+server.on('error', (error: any) => {
+    console.error('❌ Server startup error:', error);
 });
 
 export default app;

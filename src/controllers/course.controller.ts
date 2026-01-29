@@ -123,8 +123,8 @@ export const addVideo = async (req: Request, res: Response) => {
         }
 
         if (playlistId) {
-            // Find the playlist
-            const playlist = course.playlists.find(p => (p as any)._id.toString() === playlistId);
+            // Find the playlist using mongoose .id() method
+            const playlist = (course.playlists as any).id(playlistId);
             if (!playlist) {
                 return res.status(404).json({ success: false, message: 'Playlist not found' });
             }
@@ -157,8 +157,8 @@ export const deleteVideo = async (req: Request, res: Response) => {
             return res.status(404).json({ success: false, message: 'Course not found' });
         }
 
-        // Filter out the video with the given videoId
-        course.videos = course.videos.filter((v: any) => v._id.toString() !== videoId);
+        // Use mongoose pull to remove subdocument
+        (course.videos as any).pull(videoId);
 
         await course.save();
         res.json({ success: true, data: course });
