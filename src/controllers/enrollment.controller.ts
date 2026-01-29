@@ -3,28 +3,27 @@ import Enrollment from '../models/Enrollment';
 import Course from '../models/Course';
 import Stripe from 'stripe';
 
-// Use env variable
-const getStripeKey = () => {
+let _stripe: Stripe | null = null;
+const getStripe = (): Stripe | null => {
+    if (_stripe) return _stripe;
+
     const key = process.env.STRIPE_SECRET_KEY;
-    if (!key || key === 'null' || key === 'undefined' || key === '') {
-        return null;
+    console.log(`🔍 Attempting to load Stripe Key... (Found: ${!!key})`);
+
+    if (key && key !== 'null' && key !== 'undefined' && key !== '') {
+        try {
+            _stripe = new Stripe(key, {
+                apiVersion: '2023-10-16' as any,
+            });
+            console.log('🚀 Stripe initialized successfully');
+            return _stripe;
+        } catch (error) {
+            console.error('❌ Stripe initialization failed:', error);
+            return null;
+        }
     }
-    return key;
+    return null;
 };
-
-const stripeSecretKey = getStripeKey();
-let stripe: Stripe | null = null;
-
-try {
-    if (stripeSecretKey) {
-        stripe = new Stripe(stripeSecretKey, {
-            apiVersion: '2023-10-16' as any,
-        });
-        console.log('✅ Stripe initialized successfully');
-    }
-} catch (error) {
-    console.error('❌ Stripe initialization failed:', error);
-}
 
 /**
  * @desc    Purchase/Enroll in a course
@@ -58,13 +57,14 @@ export const purchaseCourse = async (req: Request, res: Response) => {
 
         // 3. Handle Stripe Payment
         if (paymentMethod === 'stripe') {
-            if (!stripe) {
+            const stripeInstance = getStripe();
+            if (!stripeInstance) {
                 return res.status(500).json({
                     success: false,
                     message: 'Stripe is currently unavailable on this server. Please ensure the API key is set correctly in settings.'
                 });
             }
-            const session = await stripe.checkout.sessions.create({
+            const session = await stripeInstance.checkout.sessions.create({
                 payment_method_types: ['card'],
                 line_items: [
                     {
