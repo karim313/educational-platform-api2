@@ -3,9 +3,16 @@ import Enrollment from '../models/Enrollment';
 import Course from '../models/Course';
 import Stripe from 'stripe';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
-    apiVersion: '2023-10-16' as any,
-});
+const stripeSecretKey = process.env.STRIPE_SECRET_KEY || '';
+let stripe: Stripe | null = null;
+
+if (stripeSecretKey) {
+    stripe = new Stripe(stripeSecretKey, {
+        apiVersion: '2023-10-16' as any,
+    });
+} else {
+    console.warn('⚠️ STRIPE_SECRET_KEY is missing. Payment features will be disabled.');
+}
 
 /**
  * @desc    Purchase/Enroll in a course
@@ -39,6 +46,12 @@ export const purchaseCourse = async (req: Request, res: Response) => {
 
         // 3. Handle Stripe Payment
         if (paymentMethod === 'stripe') {
+            if (!stripe) {
+                return res.status(500).json({
+                    success: false,
+                    message: 'Stripe is not configured on the server. Please check environment variables.'
+                });
+            }
             const session = await stripe.checkout.sessions.create({
                 payment_method_types: ['card'],
                 line_items: [
