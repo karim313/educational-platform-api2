@@ -16,6 +16,8 @@ import courseRoutes from './routes/course.routes';
 import enrollmentRoutes from './routes/enrollment.routes';
 import instructorRoutes from './routes/instructor.routes';
 
+console.log('🚀 Initializing server components...');
+
 const app: Application = express();
 
 // ==========================================
@@ -81,10 +83,11 @@ app.use((err: any, req: Request, res: Response, _next: NextFunction) => {
 // ==========================================
 // 6. SERVER INITIALIZATION
 // ==========================================
-const PORT = Number(process.env.PORT) || 8080;
+const PORT = process.env.PORT || 5000;
 
 const server = app.listen(PORT, () => {
     console.log(`✅ SERVER IS LIVE ON PORT: ${PORT}`);
+    console.log(`📡 Healthcheck available at: http://localhost:${PORT}/health`);
 
     // Connect to MongoDB AFTER the server starts listening
     const mongoUri = process.env.MONGO_URI;
