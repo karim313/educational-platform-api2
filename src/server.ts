@@ -1,9 +1,11 @@
 import dotenv from 'dotenv';
+import path from 'path';
+
+// Load env using absolute path to avoid issues with current working directory
+dotenv.config({ path: path.join(__dirname, '../.env') });
+
 import mongoose from 'mongoose';
 import app from './app';
-
-// Load env as early as possible
-dotenv.config();
 
 const PORT = process.env.PORT || 5000;
 
