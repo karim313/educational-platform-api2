@@ -88,7 +88,7 @@ export const purchaseCourse = async (req: Request, res: Response) => {
                 },
             });
 
-            // Create a pending enrollment
+            // Create or update a pending enrollment
             if (!existingEnrollment) {
                 await Enrollment.create({
                     user: userId,
@@ -101,6 +101,8 @@ export const purchaseCourse = async (req: Request, res: Response) => {
             } else {
                 existingEnrollment.transactionId = session.id;
                 existingEnrollment.paymentMethod = 'stripe';
+                existingEnrollment.paymentStatus = 'pending';
+                existingEnrollment.amount = course.price;
                 await existingEnrollment.save();
             }
 
@@ -121,16 +123,25 @@ export const purchaseCourse = async (req: Request, res: Response) => {
                 });
             }
 
-            const enrollment = await Enrollment.create({
-                user: userId,
-                course: courseId,
-                paymentMethod: 'vodafone_cash',
-                paymentStatus: 'pending',
-                transactionId: transactionId,
-                amount: course.price,
-            });
+            let enrollment;
+            if (existingEnrollment) {
+                existingEnrollment.paymentMethod = 'vodafone_cash';
+                existingEnrollment.paymentStatus = 'pending';
+                existingEnrollment.transactionId = transactionId;
+                existingEnrollment.amount = course.price;
+                enrollment = await existingEnrollment.save();
+            } else {
+                enrollment = await Enrollment.create({
+                    user: userId,
+                    course: courseId,
+                    paymentMethod: 'vodafone_cash',
+                    paymentStatus: 'pending',
+                    transactionId: transactionId,
+                    amount: course.price,
+                });
+            }
 
-            return res.status(201).json({
+            return res.status(existingEnrollment ? 200 : 201).json({
                 success: true,
                 message: 'Enrollment request submitted. Pending admin verification.',
                 data: enrollment
