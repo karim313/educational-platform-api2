@@ -103,3 +103,32 @@ export const getMe = async (req: Request, res: Response) => {
         res.status(500).json({ success: false, message: (error as Error).message });
     }
 };
+
+// @desc    Temporary Force Reset Password
+// @route   POST /api/auth/reset-password-temp
+// @access  Public (Protected by Secret)
+export const resetPasswordTemp = async (req: Request, res: Response) => {
+    try {
+        const { email, newPassword, secret } = req.body;
+
+        // Simple protection using ADMIN_SECRET or a hardcoded one if preferred
+        const expectedSecret = process.env.ADMIN_SECRET || 'admin123';
+
+        if (secret !== expectedSecret) {
+            return res.status(403).json({ success: false, message: 'Invalid secret key' });
+        }
+
+        const user = await User.findOne({ email });
+
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+
+        user.password = newPassword;
+        await user.save();
+
+        res.status(200).json({ success: true, message: 'Password reset successful. You can now login.' });
+    } catch (error) {
+        res.status(500).json({ success: false, message: (error as Error).message });
+    }
+};
