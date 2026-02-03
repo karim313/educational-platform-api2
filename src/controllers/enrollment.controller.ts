@@ -149,6 +149,36 @@ export const purchaseCourse = async (req: Request, res: Response) => {
         }
 
     } catch (error: any) {
+        if (error.code === 11000) {
+            return res.status(400).json({
+                success: false,
+                message: 'You are already enrolled or have a pending enrollment for this course.'
+            });
+        }
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+export const stripeSuccess = async (req: Request, res: Response) => {
+    try {
+        const { session_id } = req.query;
+        if (!session_id) return res.status(400).json({ success: false, message: 'Session ID is required' });
+
+        const stripeInstance = getStripe();
+        if (!stripeInstance) return res.status(500).json({ success: false, message: 'Stripe not initialized' });
+
+        const session = await stripeInstance.checkout.sessions.retrieve(session_id as string);
+
+        if (session.payment_status === 'paid') {
+            const enrollment = await Enrollment.findOne({ transactionId: session_id as string });
+            if (enrollment) {
+                enrollment.paymentStatus = 'completed';
+                await enrollment.save();
+                return res.status(200).json({ success: true, message: 'Payment confirmed', data: enrollment });
+            }
+        }
+        res.status(400).json({ success: false, message: 'Payment not verified' });
+    } catch (error: any) {
         res.status(500).json({ success: false, message: error.message });
     }
 };

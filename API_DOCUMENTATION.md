@@ -8,7 +8,7 @@ Welcome to the official API documentation for the Educational Platform.
 
 | Environment | Base URL |
 | :--- | :--- |
-| **Production** | `https://educational-platform-api2-production-75ed.up.railway.app` |
+| **Production** | `https://educational-platform-api2-production.up.railway.app` |
 | **Development** | `http://localhost:8080` |
 
 ---

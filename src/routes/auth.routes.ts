@@ -1,5 +1,6 @@
 import express from 'express';
-import { register, login } from '../controllers/auth.controller';
+import { register, login, getMe } from '../controllers/auth.controller';
+import { protect } from '../middleware/auth';
 
 const router = express.Router();
 
@@ -64,5 +65,6 @@ router.post('/register', register);
  *         description: Invalid email or password
  */
 router.post('/login', login);
+router.get('/me', protect, getMe);
 
 export default router;

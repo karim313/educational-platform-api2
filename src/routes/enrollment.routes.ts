@@ -1,5 +1,5 @@
 import express from 'express';
-import { purchaseCourse, getMyCourses, verifyEnrollment } from '../controllers/enrollment.controller';
+import { purchaseCourse, getMyCourses, verifyEnrollment, stripeSuccess } from '../controllers/enrollment.controller';
 import { protect } from '../middleware/auth';
 import { isAdmin } from '../middleware/isAdmin';
 
@@ -28,6 +28,7 @@ const router = express.Router();
  *         description: Course not found
  */
 router.post('/purchase/:courseId', protect, purchaseCourse);
+router.get('/stripe-success', protect, stripeSuccess);
 
 /**
  * @swagger
