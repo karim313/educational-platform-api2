@@ -59,7 +59,8 @@ export const createCourse = async (req: Request, res: Response) => {
             rating,
             reviews,
             hours,
-            lessons,
+
+            lessons: (Array.isArray(lessons) ? lessons.length : lessons),
             category,
             level,
             image,
@@ -79,6 +80,10 @@ export const createCourse = async (req: Request, res: Response) => {
 // @access  Private/Admin
 export const updateCourse = async (req: Request, res: Response) => {
     try {
+        if (req.body.lessons && Array.isArray(req.body.lessons)) {
+            req.body.lessons = req.body.lessons.length;
+        }
+
         const course = await Course.findByIdAndUpdate(req.params.courseId, req.body, {
             new: true,
             runValidators: true,
