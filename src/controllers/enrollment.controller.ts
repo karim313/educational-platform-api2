@@ -126,7 +126,7 @@ export const purchaseCourse = async (req: Request, res: Response) => {
             let enrollment;
             if (existingEnrollment) {
                 existingEnrollment.paymentMethod = 'vodafone_cash';
-                existingEnrollment.paymentStatus = 'pending';
+                existingEnrollment.paymentStatus = 'completed'; // Auto-approve per user request
                 existingEnrollment.transactionId = transactionId;
                 existingEnrollment.amount = course.price;
                 enrollment = await existingEnrollment.save();
@@ -135,7 +135,7 @@ export const purchaseCourse = async (req: Request, res: Response) => {
                     user: userId,
                     course: courseId,
                     paymentMethod: 'vodafone_cash',
-                    paymentStatus: 'pending',
+                    paymentStatus: 'completed', // Auto-approve per user request
                     transactionId: transactionId,
                     amount: course.price,
                 });
@@ -143,7 +143,7 @@ export const purchaseCourse = async (req: Request, res: Response) => {
 
             return res.status(existingEnrollment ? 200 : 201).json({
                 success: true,
-                message: 'Enrollment request submitted. Pending admin verification.',
+                message: 'Enrollment successful. You can now access the course.',
                 data: enrollment
             });
         }

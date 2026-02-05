@@ -47,13 +47,13 @@ Protected routes require a **JWT Bearer Token**: `Authorization: Bearer <token>`
 #### B. Vodafone Cash Flow
 1. Transfer the course price to our number: `${process.env.VODAFONE_CASH_NUMBER}`.
 2. Send `paymentMethod: "vodafone_cash"` and `transactionId: "..."`.
-3. Enrollment status will be `pending` until admin verifies.
+3. Enrollment status will be `completed` automatically (Auto-Approved).
 
-**Response (201 Created):**
+**Response (200 OK):**
 ```json
 {
   "success": true,
-  "message": "Enrollment request submitted. Pending admin verification.",
+  "message": "Enrollment successful. You can now access the course.",
   "data": { ... }
 }
 ```
