@@ -143,6 +143,11 @@ export const addVideo = async (req: Request, res: Response) => {
             course.videos.push({ title, videoUrl, duration });
         }
 
+        // Sanitize lessons field if it was incorrectly saved as an array
+        if (Array.isArray((course as any).lessons)) {
+            course.lessons = (course as any).lessons.length;
+        }
+
         await course.save();
         res.status(201).json({ success: true, data: course });
     } catch (error) {
@@ -202,6 +207,11 @@ export const deleteVideo = async (req: Request, res: Response) => {
 
         // Use mongoose pull to remove subdocument
         (course.videos as any).pull(videoId);
+
+        // Sanitize lessons field if it was incorrectly saved as an array
+        if (Array.isArray((course as any).lessons)) {
+            course.lessons = (course as any).lessons.length;
+        }
 
         await course.save();
         res.json({ success: true, data: course });
