@@ -10,7 +10,7 @@ const options: swaggerJsdoc.Options = {
         },
         servers: [
             {
-                url: 'https://educational-platform-api2-production.up.railway.app',
+                url: process.env.API_URL || 'https://educational-platform-api2-production-d27e.up.railway.app',
                 description: 'Production server',
             },
             {

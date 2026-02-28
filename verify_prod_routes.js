@@ -1,5 +1,5 @@
 const main = async () => {
-    const baseUrl = 'https://educational-platform-api2-production.up.railway.app';
+    const baseUrl = process.env.API_URL || 'https://educational-platform-api2-production-d27e.up.railway.app';
     const loginUrl = `${baseUrl}/api/auth/login`;
 
     console.log(`Checking ${loginUrl}...`);

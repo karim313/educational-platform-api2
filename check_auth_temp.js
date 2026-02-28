@@ -1,5 +1,5 @@
 const main = async () => {
-    const url = 'https://educational-platform-api2-production.up.railway.app/api/auth/register';
+    const url = `${process.env.API_URL || 'https://educational-platform-api2-production-d27e.up.railway.app'}/api/auth/register`;
     const body = {
         name: "Karim",
         email: "karim2004@example.com",
