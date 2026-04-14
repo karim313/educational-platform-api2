@@ -119,13 +119,28 @@ export const deleteCourse = async (req: Request, res: Response) => {
 // @access  Private/Admin
 export const addVideo = async (req: Request, res: Response) => {
     try {
-        const { title, videoUrl, duration } = req.body;
+        let { title, videoUrl, duration } = req.body;
         const { courseId, playlistId } = req.params;
+
+        // If a file was uploaded, use its path (Cloudinary URL)
+        if (req.file) {
+            videoUrl = req.file.path;
+        }
+
+        if (!videoUrl) {
+            return res.status(400).json({ success: false, message: 'Please provide a video URL or upload a file' });
+        }
+
+        // When using multipart/form-data, duration might come as a string
+        const videoDuration = typeof duration === 'string' ? parseFloat(duration) : duration;
+
         const course = await Course.findById(courseId);
 
         if (!course) {
             return res.status(404).json({ success: false, message: 'Course not found' });
         }
+
+        const videoData = { title, videoUrl, duration: videoDuration || 0 };
 
         if (playlistId) {
             // Find the playlist using mongoose .id() method
@@ -134,13 +149,13 @@ export const addVideo = async (req: Request, res: Response) => {
                 return res.status(404).json({ success: false, message: 'Playlist not found' });
             }
             if (!playlist.videos) playlist.videos = [];
-            playlist.videos.push({ title, videoUrl, duration });
+            playlist.videos.push(videoData);
         } else {
             // Add directly to course videos array
             if (!course.videos) {
                 course.videos = [];
             }
-            course.videos.push({ title, videoUrl, duration });
+            course.videos.push(videoData);
         }
 
         // Sanitize lessons field if it was incorrectly saved as an array

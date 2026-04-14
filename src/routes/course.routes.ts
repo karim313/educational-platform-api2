@@ -15,6 +15,7 @@ import {
 import { protect } from '../middleware/auth';
 import { isAdmin } from '../middleware/isAdmin';
 import { authorize } from '../middleware/authorize';
+import upload from '../middleware/upload';
 
 const router = express.Router();
 
@@ -31,8 +32,8 @@ router.delete('/', protect, isAdmin, deleteAllCourses);
 // Video management
 router.get('/:courseId/videos', getVideos);
 router.get('/:courseId/playlists/:playlistId/videos', getPlaylistVideos);
-router.post('/:courseId/videos', protect, authorize('admin', 'teacher'), addVideo);
-router.post('/:courseId/playlists/:playlistId/videos', protect, authorize('admin', 'teacher'), addVideo);
+router.post('/:courseId/videos', protect, authorize('admin', 'teacher'), upload.single('video'), addVideo);
+router.post('/:courseId/playlists/:playlistId/videos', protect, authorize('admin', 'teacher'), upload.single('video'), addVideo);
 router.delete('/:courseId/videos/:videoId', protect, authorize('admin', 'teacher'), deleteVideo);
 router.delete('/:courseId/videos', protect, authorize('admin', 'teacher'), deleteAllVideos);
 
