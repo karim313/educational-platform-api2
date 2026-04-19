@@ -4,6 +4,7 @@ export interface IVideo {
     title: string;
     videoUrl: string;
     duration: number;
+    videoType: 'youtube' | 'uploaded';
 }
 
 
@@ -42,6 +43,11 @@ const videoSchema = new mongoose.Schema<IVideo>({
     duration: {
         type: Number, // duration in minutes
         required: [true, 'Please add a video duration'],
+    },
+    videoType: {
+        type: String,
+        enum: ['youtube', 'uploaded'],
+        default: 'youtube',
     },
 });
 

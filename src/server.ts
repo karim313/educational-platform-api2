@@ -1,8 +1,11 @@
 import dotenv from 'dotenv';
 import path from 'path';
 
-// Load env using absolute path to avoid issues with current working directory
-dotenv.config({ path: path.join(__dirname, '../.env') });
+// Load env with fallback for different environments
+const envPath = path.join(__dirname, '../.env');
+dotenv.config({ path: envPath });
+// Also try loading from default locations
+dotenv.config();
 
 import mongoose from 'mongoose';
 import app from './app';

@@ -122,9 +122,18 @@ export const addVideo = async (req: Request, res: Response) => {
         let { title, videoUrl, duration } = req.body;
         const { courseId, playlistId } = req.params;
 
-        // If a file was uploaded, use its path (Cloudinary URL)
+        // Determine video type
+        let videoType: 'youtube' | 'uploaded' = 'youtube';
         if (req.file) {
             videoUrl = req.file.path;
+            videoType = 'uploaded';
+        } else if (videoUrl) {
+            if (videoUrl.includes('youtube.com') || videoUrl.includes('youtu.be')) {
+                videoType = 'youtube';
+            } else {
+                // If it's a direct link (like Cloudinary URL pasted manually), use 'uploaded' for standard player
+                videoType = 'uploaded';
+            }
         }
 
         if (!videoUrl) {
@@ -140,7 +149,12 @@ export const addVideo = async (req: Request, res: Response) => {
             return res.status(404).json({ success: false, message: 'Course not found' });
         }
 
-        const videoData = { title, videoUrl, duration: videoDuration || 0 };
+        const videoData = { 
+            title, 
+            videoUrl, 
+            duration: videoDuration || 0,
+            videoType
+        };
 
         if (playlistId) {
             // Find the playlist using mongoose .id() method
