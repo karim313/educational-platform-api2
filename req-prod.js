@@ -8,7 +8,7 @@ const data = JSON.stringify({
 });
 
 const options = {
-  hostname: 'educational-platform-api2-production-2097.up.railway.app',
+  hostname: 'educational-platform-api2-production-d04a.up.railway.app',
   port: 443,
   path: '/api/auth/register',
   method: 'POST',

@@ -22,7 +22,22 @@ app.get('/', (_req, res) => {
 
 // Middlewares
 app.use(helmet());
-app.use(cors({ origin: '*', credentials: true }));
+const allowedOrigins = [
+    'http://localhost:5173',
+    'https://eduplatform-dashbpoard-front-end.vercel.app',
+];
+
+app.use(cors({
+    origin: (origin, callback) => {
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(null, false);
+        }
+    },
+    credentials: true,
+    methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE', 'OPTIONS'],
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
